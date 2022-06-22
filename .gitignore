@@ -399,7 +399,3 @@ FodyWeavers.xsd
 
 # Premake
 premake5.exe
-
-#Submodules
-build/
-libraries/
