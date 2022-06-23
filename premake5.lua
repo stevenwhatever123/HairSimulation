@@ -63,10 +63,10 @@ project "HairSimulation"
 	files
 	{
 		"headers/**.h",
-		"src/**.cpp"
+		"src/**.cpp",
+		"*.h",
+		"*.cpp"
 	}
-
-	files {"**.h", "**.cpp"}
 
 	pchheader "pch.h"
 	pchsource "pch.cpp"

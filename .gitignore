@@ -399,3 +399,8 @@ FodyWeavers.xsd
 
 # Premake
 premake5.exe
+
+#Visual Studio
+*.sln
+*.vcxproj
+*.vcxproj.filters
