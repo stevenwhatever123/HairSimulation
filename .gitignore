@@ -404,3 +404,7 @@ premake5.exe
 *.sln
 *.vcxproj
 *.vcxproj.filters
+
+#dll
+*.dll
+*.idb

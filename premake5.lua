@@ -18,6 +18,7 @@ workspace "HairSimulation"
 	architecture "x64"
 
 include "premake/premake_glfw.lua"
+include "premake/premake_assimp.lua"
 
 project "HairSimulation"
 	kind "ConsoleApp"
