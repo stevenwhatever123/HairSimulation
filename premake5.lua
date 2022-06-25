@@ -16,6 +16,7 @@ newaction {
 workspace "HairSimulation"
 	configurations {"Debug", "Release"}
 	architecture "x64"
+	startproject "HairSimulation"
 
 include "premake/premake_glfw.lua"
 include "premake/premake_assimp.lua"
@@ -38,11 +39,13 @@ project "HairSimulation"
 		"",
 		"headers",
 		"libraries/glfw/include",
+		"libraries/assimp/include",
 	}
 
 	dependson
 	{
 		"glfw",
+		"assimp",
 	}
 
 	links
@@ -50,6 +53,7 @@ project "HairSimulation"
 		"user32",
 		"opengl32",
 		"glfw",
+		"assimp",
 	}
 
 	vpaths

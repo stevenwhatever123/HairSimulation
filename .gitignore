@@ -405,6 +405,15 @@ premake5.exe
 *.vcxproj
 *.vcxproj.filters
 
-#dll
+#Generated files
 *.dll
 *.idb
+*.lib
+*.cmake
+*.depend
+*.stamp
+*.pc
+*.rule
+*.exe
+*.bin
+*.check_cache

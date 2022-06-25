@@ -1,110 +1,46 @@
-project '*'
-	includedirs {
-		'_config_headers/',
-		'_config_headers/assimp/', -- Location of assimp's config.h, for a template see include/assimp/config.h.in
-		'assimp/include/',
-	}
-project 'assimp'
-	kind 'SharedLib'
-	warnings 'Off'
-	optimize 'Speed'
 
-	includedirs {
-		'_config_headers/',
-		'_config_headers/assimp/',
-		'assimp/',
-		'assimp/contrib/',
-		'assimp/contrib/irrXML/',
-		'assimp/contrib/unzip/',
-		'assimp/contrib/rapidjson/include/',
-		'assimp/code'
-	}
-	files {
-		-- Dependencies
-		'assimp/contrib/unzip/**',
-		'assimp/contrib/irrXML/**',
-		'assimp/contrib/zlib/*',
-		-- Common
-		'assimp/code/Common/**',
-		'assimp/code/PostProcessing/**',
-		'assimp/code/Material/**',
-		'assimp/code/CApi/**',
-		-- Importers
-		'assimp/code/Collada/**',
-		'assimp/code/Obj/**',
-		-- 'assimp/code/Blender/**', 'assimp/contrib/poly2tri/poly2tri/**',
-		'assimp/code/FBX/**',
-		-- 'assimp/code/glTF2/**',
-		-- 'assimp/code/glTF/**',
-		'assimp/code/Assbin/**' -- For caching
-	}
-	-- Importers
-	defines {
-		'ASSIMP_BUILD_NO_3D_IMPORTER',
-		'ASSIMP_BUILD_NO_3DS_IMPORTER',
-		'ASSIMP_BUILD_NO_3MF_IMPORTER',
-		'ASSIMP_BUILD_NO_AC_IMPORTER',
-		'ASSIMP_BUILD_NO_AMF_IMPORTER',
-		'ASSIMP_BUILD_NO_ASE_IMPORTER',
-		-- 'ASSIMP_BUILD_NO_ASSBIN_IMPORTER'
-		'ASSIMP_BUILD_NO_B3D_IMPORTER',
-		'ASSIMP_BUILD_NO_BLEND_IMPORTER',
-		'ASSIMP_BUILD_NO_BVH_IMPORTER',
-		'ASSIMP_BUILD_NO_C4D_IMPORTER',
-		'ASSIMP_BUILD_NO_COB_IMPORTER',
-		-- 'ASSIMP_BUILD_NO_COLLADA_IMPORTER',
-		'ASSIMP_BUILD_NO_CSM_IMPORTER',
-		'ASSIMP_BUILD_NO_DXF_IMPORTER',
-		-- 'ASSIMP_BUILD_NO_FBX_IMPORTER',
-		'ASSIMP_BUILD_NO_GLTF_IMPORTER',
-		'ASSIMP_BUILD_NO_HMP_IMPORTER',
-		'ASSIMP_BUILD_NO_IFC_IMPORTER',
-		'ASSIMP_BUILD_NO_IRR_IMPORTER',
-		'ASSIMP_BUILD_NO_IRRMESH_IMPORTER',
-		'ASSIMP_BUILD_NO_LWO_IMPORTER',
-		'ASSIMP_BUILD_NO_LWS_IMPORTER',
-		'ASSIMP_BUILD_NO_M3D_IMPORTER',
-		'ASSIMP_BUILD_NO_MD2_IMPORTER',
-		'ASSIMP_BUILD_NO_MD3_IMPORTER',
-		'ASSIMP_BUILD_NO_MD5_IMPORTER',
-		'ASSIMP_BUILD_NO_MDC_IMPORTER',
-		'ASSIMP_BUILD_NO_MDL_IMPORTER',
-		'ASSIMP_BUILD_NO_MMD_IMPORTER',
-		'ASSIMP_BUILD_NO_MS3D_IMPORTER',
-		'ASSIMP_BUILD_NO_NDO_IMPORTER',
-		'ASSIMP_BUILD_NO_NFF_IMPORTER',
-		-- 'ASSIMP_BUILD_NO_OBJ_IMPORTER',
-		'ASSIMP_BUILD_NO_OFF_IMPORTER',
-		'ASSIMP_BUILD_NO_OGRE_IMPORTER',
-		'ASSIMP_BUILD_NO_OPENGEX_IMPORTER',
-		'ASSIMP_BUILD_NO_PLY_IMPORTER',
-		'ASSIMP_BUILD_NO_Q3BSP_IMPORTER',
-		'ASSIMP_BUILD_NO_Q3D_IMPORTER',
-		'ASSIMP_BUILD_NO_RAW_IMPORTER',
-		'ASSIMP_BUILD_NO_SIB_IMPORTER',
-		'ASSIMP_BUILD_NO_SMD_IMPORTER',
-		'ASSIMP_BUILD_NO_STEP_IMPORTER',
-		'ASSIMP_BUILD_NO_STL_IMPORTER',
-		'ASSIMP_BUILD_NO_TERRAGEN_IMPORTER',
-		'ASSIMP_BUILD_NO_X_IMPORTER',
-		'ASSIMP_BUILD_NO_X3D_IMPORTER',
-		'ASSIMP_BUILD_NO_XGL_IMPORTER'
-	}
-	-- Exporters
-	defines {
-		'ASSIMP_BUILD_NO_COLLADA_EXPORTER',
-		'ASSIMP_BUILD_NO_X_EXPORTER',
-		'ASSIMP_BUILD_NO_STEP_EXPORTER',
-		'ASSIMP_BUILD_NO_OBJ_EXPORTER',
-		'ASSIMP_BUILD_NO_STL_EXPORTER',
-		'ASSIMP_BUILD_NO_PLY_EXPORTER',
-		'ASSIMP_BUILD_NO_3DS_EXPORTER',
-		'ASSIMP_BUILD_NO_GLTF_EXPORTER',
-		-- 'ASSIMP_BUILD_NO_ASSBIN_EXPORTER',
-		'ASSIMP_BUILD_NO_ASSXML_EXPORTER',
-		'ASSIMP_BUILD_NO_X3D_EXPORTER',
-		'ASSIMP_BUILD_NO_FBX_EXPORTER',
-		'ASSIMP_BUILD_NO_M3D_EXPORTER',
-		'ASSIMP_BUILD_NO_3MF_EXPORTER',
-		'ASSIMP_BUILD_NO_ASSJSON_EXPORTER'
-	}
+
+externalproject "zlib"
+	location "../libraries/build_assimp/contrib/zlib/"
+	filename "zlibstatic"
+	kind "StaticLib"
+	language "C++"
+	targetdir "../libs/compiled_libs/assimp/Debug/"
+
+
+
+externalproject "Assimp"
+  location "../libraries/build_assimp/code/"
+  filename "assimp"
+  kind "StaticLib"
+  language "C++"
+
+
+  config_file = io.readfile("../libraries/assimp/include/assimp/config.h.in"):gsub("#cmakedefine .", "// fuck you ")
+  io.writefile("../libraries/assimp/include/assimp/config.h", config_file)
+
+  targetdir "../libraries/compiled_libs/assimp"
+
+  if _ACTION ~= 'clean_up' and _ACTION ~= 'clean_up_full'  then
+	  os.executef('cmake --log-level NOTICE -G %q -B%s -S%s -D %s -D %s -D %s -D %s -D %s',
+		  "Visual Studio 17 2022",
+		  "../libraries/build_assimp/",
+		  "../libraries/assimp/",
+		  "BUILD_SHARED_LIBS:BOOL=ON",
+		  "ASSIMP_BUILD_ZLIB=ON",
+		  'ASSIMP_ARCHIVE_OUTPUT_DIRECTORY:STRING=../../compiled_libraries/assimp',
+		  'ASSIMP_LIBRARY_OUTPUT_DIRECTORY:STRING=../../compiled_libraries/assimp',
+		  'ASSIMP_RUNTIME_OUTPUT_DIRECTORY:STRING=../../compiled_libraries/assimp'
+	  )
+  end
+
+  dependson {
+	  "zlib"
+  }
+
+  filter "configurations:Debug"
+	  runtime "Debug"
+	  symbols "on"
+
+
+

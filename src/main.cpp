@@ -2,6 +2,8 @@
 
 #include <SystemManager.h>
 
+#include <assimp/Importer.hpp>
+
 int main(void)
 {
     SystemManager* systemManager = new SystemManager();
