@@ -20,6 +20,7 @@ workspace "HairSimulation"
 
 include "premake/premake_glfw.lua"
 include "premake/premake_assimp.lua"
+include "premake/premake_glm.lua"
 
 project "HairSimulation"
 	kind "ConsoleApp"
@@ -40,12 +41,14 @@ project "HairSimulation"
 		"headers",
 		"libraries/glfw/include",
 		"libraries/assimp/include",
+		"libraries/glm/",
 	}
 
 	dependson
 	{
 		"glfw",
 		"assimp",
+		"glm",
 	}
 
 	links
@@ -54,6 +57,7 @@ project "HairSimulation"
 		"opengl32",
 		"glfw",
 		"assimp",
+		"glm"
 	}
 
 	vpaths
