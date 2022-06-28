@@ -77,28 +77,50 @@ void SystemManager::update_inputs()
     if (keys['L'])
     {
         bool readSuccess;
-        std::string filename;
-        std::tie(readSuccess, filename) = SystemUtils::selectFile();
-        
+        std::string modelFilename;
+        std::string materialFilename;
+        std::tie(readSuccess, modelFilename) = SystemUtils::selectFile();
+
+        bool materialReadSuccess = false;
+        materialFilename = modelFilename.substr(0, modelFilename.find_last_of('.')) + ".mtl";
+        if (std::filesystem::exists(materialFilename)) materialReadSuccess = true;
+
         if (readSuccess)
         {
-            std::cout << "Success reading: " << filename << "\n";
-            Model* modelScene = SystemUtils::readModel(filename.c_str());
+            std::cout << "Success reading: " << modelFilename << "\n";
+            Model* modelScene = SystemUtils::readModel(modelFilename.c_str());
             std::cout << "Nubmer of Meshes: " << modelScene->meshes.size() << "\n";
 
-            for (u32 i = 0; i < modelScene->meshes.size(); i++)
-            {
-                std::cout << "Mesh " << i << " primitive type: " << modelScene->meshes[i]->primitive_type << "\n";
-            }
+            if (materialReadSuccess)
+                std::cout << "Material Read Successfully!" << "\n";
+            else
+                std::cout << "Error: Cannot find: " << materialFilename << "\n";
 
             for (u32 i = 0; i < modelScene->meshes.size(); i++)
             {
-                std::cout << "Mesh " << i << " material index: " << modelScene->meshes[i]->material_index << "\n";
+                std::cout << "Mesh " << i << "\n";
+                std::cout << "Name: " << modelScene->meshes[i]->name << "\n";
+                std::cout << "Primitive type: " << 
+                    modelScene->meshes[i]->primitive_type << "\n";
+                std::cout << "Material index: " << 
+                    modelScene->meshes[i]->material_index << "\n";
+                std::cout << "===============================" << "\n";
+            }
+
+            for (u32 i = 0; i < modelScene->materials.size(); i++)
+            {
+                std::cout << "Material " << i << "\n";
+                std::cout << "Name: " << modelScene->materials[i]->name << "\n";
+                std::cout << "Color: " << 
+                    glm::to_string(modelScene->materials[i]->color) << "\n";
+                std::cout << "Has Texture: " << modelScene->materials[i]->has_texture << "\n";
+                std::cout << "Texture Name: " << modelScene->materials[i]->texture_name << "\n";
+                std::cout << "===============================" << "\n";
             }
         }
         else
         {
-            std::cout << "Error reading: " << filename << "\n";
+            std::cout << "Error reading: " << modelFilename << "\n";
         }
     }
 }

@@ -35,6 +35,8 @@ Model* SystemUtils::extractScene(const aiScene* pScene)
 
 		Mesh* mesh = new Mesh();
 
+		mesh->name = pMesh->mName.C_Str();
+
 		mesh->positions.resize(pMesh->mNumVertices);
 		mesh->normals.resize(pMesh->mNumVertices);
 		mesh->texCoords.resize(pMesh->mNumVertices);
@@ -78,18 +80,7 @@ Model* SystemUtils::extractScene(const aiScene* pScene)
 		}
 
 		mesh->primitive_type = pMesh->mPrimitiveTypes;
-
-		const bool has_color = pMesh->HasVertexColors(0);
-
-		mesh->has_color = has_color;
-
-		if (has_color)
-		{
-			mesh->color.x = (f32)pMesh->mColors[0]->r;
-			mesh->color.y = (f32)pMesh->mColors[0]->g;
-			mesh->color.z = (f32)pMesh->mColors[0]->b;
-			mesh->color.w = (f32)pMesh->mColors[0]->a;
-		}
+		mesh->material_index = pMesh->mMaterialIndex;
 
 		meshScene->meshes[i] = mesh;
 	}
@@ -97,13 +88,43 @@ Model* SystemUtils::extractScene(const aiScene* pScene)
 	// Extract material data if available
 	if (pScene->HasMaterials())
 	{
-		std::cout << "I have material" << "\n";
+		meshScene->materials.resize(pScene->mNumMaterials);
+
 		for (u32 i = 0; i < pScene->mNumMaterials; i++)
 		{
-			aiMaterial* pMaterial = pScene->mMaterials[0];
+			Material* material = new Material();
+
+			aiMaterial* pMaterial = pScene->mMaterials[i];
 
 			// Materials?
-			//mesh->material_index = pMesh->mMaterialIndex;
+			aiString materialName;
+			aiReturn ret;
+
+			ret = pMaterial->Get(AI_MATKEY_NAME, materialName);
+			if (ret != AI_SUCCESS) materialName = "";
+
+			material->name = materialName.C_Str();
+
+			int numTextures = pMaterial->GetTextureCount(aiTextureType_DIFFUSE);
+			aiString textureName;
+			if (numTextures > 0)
+			{
+				ret = pMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), 
+					textureName);
+
+				material->has_texture = true;
+				material->texture_name = textureName.C_Str();
+			}
+
+			// Color
+			aiColor3D color(0, 0, 0);
+			ret = pMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+
+			material->color.x = color.r;
+			material->color.y = color.g;
+			material->color.z = color.b;
+
+			meshScene->materials[i] = material;
 		}
 	}
 

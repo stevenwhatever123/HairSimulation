@@ -3,7 +3,8 @@
 #include "Model.h"
 
 Model::Model():
-	meshes()
+	meshes(),
+	materials()
 {
 
 }

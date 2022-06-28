@@ -5,6 +5,7 @@
 #include <vector>
 #include <fstream>
 #include <cstdint>
+#include <filesystem>
 
 // Windows
 #include <Windows.h>
@@ -14,6 +15,7 @@
 
 // GLM
 #include <glm/glm.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 // Assimp
 #include <assimp/Importer.hpp>
