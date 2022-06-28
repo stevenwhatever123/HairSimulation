@@ -91,18 +91,20 @@ Model* SystemUtils::extractScene(const aiScene* pScene)
 			mesh->color.w = (f32)pMesh->mColors[0]->a;
 		}
 
-		aiMaterial* pMaterial = pScene->mMaterials[0];
-
-		// Extract material data
-		if (pScene->HasMaterials())
-		{
-			std::cout << "I have material" << "\n";
-		}
-
-		// Materials?
-		mesh->material_index = pMesh->mMaterialIndex;
-
 		meshScene->meshes[i] = mesh;
+	}
+
+	// Extract material data if available
+	if (pScene->HasMaterials())
+	{
+		std::cout << "I have material" << "\n";
+		for (u32 i = 0; i < pScene->mNumMaterials; i++)
+		{
+			aiMaterial* pMaterial = pScene->mMaterials[0];
+
+			// Materials?
+			//mesh->material_index = pMesh->mMaterialIndex;
+		}
 	}
 
 	return meshScene;

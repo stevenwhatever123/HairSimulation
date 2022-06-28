@@ -2,7 +2,7 @@
 #define ASSIMP_REVISION_H_INC
 
 #define GitVersion 0x33b67228
-#define GitBranch "master"
+#define GitBranch "HEAD"
 
 #define VER_MAJOR 5
 #define VER_MINOR 2

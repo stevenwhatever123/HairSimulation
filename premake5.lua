@@ -63,10 +63,14 @@ project "HairSimulation"
 	vpaths
 	{
 		["Headers"]					= {"headers/*.h"},
+		["Headers/Managers"]		= {"headers/Managers/*.cpp"},
+		["Headers/Utils"]			= {"headers/Utils/*.cpp"},
 
 		["Precompiled Headers"]		= {"*.h", "*.cpp"},
 
-		["Source Files"]			= {"src/*.cpp"}
+		["Source Files"]			= {"src/*.cpp"},
+		["Source Files/Managers"]	= {"src/Managers/*.cpp"},
+		["Source Files/Utils"]		= {"src/Utils/*.cpp"},
 	}
 
 	files
