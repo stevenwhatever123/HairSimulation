@@ -417,5 +417,6 @@ premake5.exe
 *.exe
 *.bin
 *.check_cache
-libraries/compiled_libraries
+bin
+libraries/compiled_libraries/
 libraries/build*
