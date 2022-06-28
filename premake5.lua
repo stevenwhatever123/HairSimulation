@@ -79,3 +79,5 @@ project "HairSimulation"
 
 	pchheader "pch.h"
 	pchsource "pch.cpp"
+
+			postbuildcommands { '{COPYFILE} "%{wks.location}/libraries/compiled_libraries/assimp/Debug/assimp-vc143-mtd.dll" %{cfg.targetdir}'  }
