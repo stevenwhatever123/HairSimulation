@@ -1,6 +1,7 @@
 #include <pch.h>
 
 #include <Managers/SystemManager.h>
+#include <Renderer.h>
 
 SystemManager::SystemManager() : keys()
 {
@@ -11,6 +12,7 @@ SystemManager::SystemManager() : keys()
 void SystemManager::init()
 {
     init_window();
+    init_renderer();
 }
 
 void SystemManager::init_window()
@@ -22,17 +24,48 @@ void SystemManager::init_window()
         closeWindow = true;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(640, 480, "Hair Simulation", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
         closeWindow = true;
+        return;
     }
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
     glfwSetWindowUserPointer(window, this);
+
+    // Print hardware detils
+
+    int CPUInfo[4] = { -1 };
+    unsigned   nExIds, i = 0;
+    char CPUBrandString[0x40];
+    // Get the information associated with each extended ID.
+    __cpuid(CPUInfo, 0x80000000);
+    nExIds = CPUInfo[0];
+    for (i = 0x80000000; i <= nExIds; ++i)
+    {
+        __cpuid(CPUInfo, i);
+        // Interpret CPU brand string
+        if (i == 0x80000002)
+            memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
+        else if (i == 0x80000003)
+            memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
+        else if (i == 0x80000004)
+            memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
+    }
+    //string includes manufacturer, model and clockspeed
+    printf("CPU: %s\n", CPUBrandString);
+
+    MEMORYSTATUSEX statex;
+    statex.dwLength = sizeof(statex);
+    GlobalMemoryStatusEx(&statex);
+    printf("System Memory (RAM): %i MB\n", (statex.ullTotalPhys / 1024) / 1024);
+
+    printf("GPU: %s\n", glGetString(GL_RENDERER));
+    printf("OpenGL version: %s\n", glGetString(GL_VERSION));
 
     // Keyboard handler
     auto key_callback = [](GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -52,6 +85,12 @@ void SystemManager::init_window()
     glfwSetKeyCallback(window, key_callback);
 }
 
+void SystemManager::init_renderer()
+{
+    renderer = new Renderer();
+    renderer->init();
+}
+
 void SystemManager::update()
 {
     update_inputs();
@@ -63,8 +102,7 @@ void SystemManager::update()
         glfwTerminate();
     }
 
-    /* Render here */
-    glClear(GL_COLOR_BUFFER_BIT);
+    update_renderer();
 
     glfwSwapBuffers(window);
 }
@@ -123,6 +161,11 @@ void SystemManager::update_inputs()
             std::cout << "Error reading: " << modelFilename << "\n";
         }
     }
+}
+
+void SystemManager::update_renderer()
+{
+    renderer->draw();
 }
 
 void SystemManager::readFile()
