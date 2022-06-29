@@ -37,6 +37,8 @@ void SystemManager::init_window()
 
     glfwSetWindowUserPointer(window, this);
 
+    gladLoadGL();
+
     // Print hardware detils
 
     int CPUInfo[4] = { -1 };

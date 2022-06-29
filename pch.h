@@ -10,6 +10,9 @@
 // Windows
 #include <Windows.h>
 
+// Glad
+#include <glad/glad.h>
+
 // GLFW
 #include <glfw/glfw3.h>
 
@@ -22,6 +25,3 @@
 #include <assimp/Exporter.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-
-// Glad
-#include <glad/glad.h>
