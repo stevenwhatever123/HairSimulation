@@ -40,7 +40,6 @@ Model* SystemUtils::extractScene(const aiScene* pScene)
 		mesh->positions.resize(pMesh->mNumVertices);
 		mesh->normals.resize(pMesh->mNumVertices);
 		mesh->texCoords.resize(pMesh->mNumVertices);
-		mesh->face.resize(pMesh->mNumFaces);
 
 		const bool has_texture = pMesh->HasTextureCoords(0);
 
@@ -69,11 +68,9 @@ Model* SystemUtils::extractScene(const aiScene* pScene)
 		const aiFace* face = pMesh->mFaces;
 		for (u32 j = 0; j < pMesh->mNumFaces; j++)
 		{
-			mesh->face[j].resize(face->mNumIndices);
-
 			for (u32 k = 0; k < face->mNumIndices; k++)
 			{
-				mesh->face[j][k] = (u32)face->mIndices[k];
+				mesh->indicies.push_back((u32)face->mIndices[k]);
 			}
 
 			face++;

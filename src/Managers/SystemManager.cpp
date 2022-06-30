@@ -90,7 +90,6 @@ void SystemManager::init_window()
 void SystemManager::init_renderer()
 {
     renderer = new Renderer();
-    renderer->init();
 }
 
 void SystemManager::update()
@@ -157,6 +156,13 @@ void SystemManager::update_inputs()
                 std::cout << "Texture Name: " << modelScene->materials[i]->texture_name << "\n";
                 std::cout << "===============================" << "\n";
             }
+
+            for (Mesh* mesh : modelScene->meshes)
+            {
+                renderer->addObject(mesh);
+            }
+
+            modelScene->meshes.clear();
         }
         else
         {

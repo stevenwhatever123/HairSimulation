@@ -9,7 +9,7 @@ public:
 	std::vector<vec3> positions;
 	std::vector<vec3> normals;
 	std::vector<vec2> texCoords;
-	std::vector<std::vector<u32>> face;
+	std::vector<u32> indicies;
 
 	u32 primitive_type;
 

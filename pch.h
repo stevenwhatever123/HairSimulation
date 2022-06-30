@@ -6,6 +6,8 @@
 #include <fstream>
 #include <cstdint>
 #include <filesystem>
+#include <algorithm>
+#include <iterator>
 
 // Windows
 #include <Windows.h>

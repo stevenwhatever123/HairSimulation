@@ -7,7 +7,7 @@ Mesh::Mesh() :
 	positions(),
 	normals(),
 	texCoords(),
-	face(),
+	indicies(),
 	primitive_type(0),
 	material_index(0)
 {
