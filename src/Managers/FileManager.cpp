@@ -30,7 +30,6 @@ std::tuple<bool, std::string> SystemUtils::selectFile()
 		char charPath[256];
 		//std::wcstombs(charPath, szFile, 256);
 		std::wcstombs(charPath, szFile, 256);
-		std::cout << charPath << "\n";
 		return { true, std::string(charPath) };
 	}
 	else

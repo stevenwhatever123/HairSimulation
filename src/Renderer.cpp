@@ -1,12 +1,14 @@
 #include "pch.h"
 #include "Renderer.h"
+#include "GLShader.h"
 
-Renderer::Renderer():
+Renderer::Renderer() :
 	VBO(-1),
 	NBO(-1),
 	TCBO(-1),
 	EBO(-1),
 	VAO(-1),
+	programId(0),
 	clear_color(0),
 	positions(),
 	indicies(),
@@ -27,6 +29,7 @@ void Renderer::init()
 	glDisable(GL_CULL_FACE);
 	glDepthMask(GL_TRUE);
 
+	// Set clear color
 	clear_color.x = 0.0f;	// R
 	clear_color.y = 1.0f;	// G
 	clear_color.z = 0.0f;	// B
@@ -38,12 +41,19 @@ void Renderer::init()
 		clear_color.z,
 		clear_color.w
 	);
+
+	// Set shader program
+	programId = SystemUtils::loadShader("shader/headVertexShader.glsl", "shader/headFragmentShader.glsl");
 }
 
 void Renderer::draw()
 {
 	/* Render here */
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glUseProgram(programId);
+
+	//glBindVertexArray(VAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -65,8 +75,6 @@ void Renderer::draw()
 			GL_UNSIGNED_INT, 
 			(void*) (renderObject.startIndex * sizeof(u32)));
 	}
-
-	//glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, (void*) 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

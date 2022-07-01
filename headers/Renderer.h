@@ -22,7 +22,7 @@ private:
 
 	GLuint VAO;				// Vertex Array Pointer
 
-	GLint positionSizeInGpu;
+	GLuint programId;
 
 	std::vector<glm::vec3> positions;
 	std::vector<u32> indicies;

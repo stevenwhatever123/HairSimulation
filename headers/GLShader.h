@@ -1,13 +1,8 @@
 #pragma once
 #include "Types.h"
 
-class GLShader
+namespace SystemUtils
 {
-private:
-
-public:
-
-public:
+	// Load, compile and link shader program with the renderer
 	GLuint loadShader(const char* vertexShaderPath, const char* fragmentShaderPath);
-};
-
+}
