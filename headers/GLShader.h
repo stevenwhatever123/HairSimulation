@@ -1,8 +1,26 @@
 #pragma once
 #include "Types.h"
 
-namespace SystemUtils
+class GLShader
 {
+private:
+	GLuint programId;
+
+public:
+
+public:
+	GLShader();
+	GLShader(const char* vertexShaderPath, const char* fragmentShaderPath);
+
+	~GLShader();
+
 	// Load, compile and link shader program with the renderer
-	GLuint loadShader(const char* vertexShaderPath, const char* fragmentShaderPath);
-}
+	void loadShader(const char* vertexShaderPath, const char* fragmentShaderPath);
+
+	// Command funtions
+	void use();
+	void setUniformMat4(const char* name, mat4& value);
+
+	// Getters
+	GLuint getAttribLocation(const char* attribute);
+};

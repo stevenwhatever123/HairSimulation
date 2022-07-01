@@ -1,7 +1,23 @@
 #include "pch.h"
 #include "GLShader.h"
 
-GLuint SystemUtils::loadShader(const char* vertexShaderPath, const char* fragmentShaderPath)
+GLShader::GLShader() :
+	programId(0)
+{
+	
+}
+
+GLShader::GLShader(const char* vertexShaderPath, const char* fragmentShaderPath)
+{
+	loadShader(vertexShaderPath, fragmentShaderPath);
+}
+
+GLShader::~GLShader()
+{
+
+}
+
+void GLShader::loadShader(const char* vertexShaderPath, const char* fragmentShaderPath)
 {
 	GLuint vertexShaderId = glCreateShader(GL_VERTEX_SHADER);
 	GLuint fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
@@ -19,7 +35,7 @@ GLuint SystemUtils::loadShader(const char* vertexShaderPath, const char* fragmen
 	else
 	{
 		printf("Failed to read vertex shader: %s\n", vertexShaderPath);
-		return 0;
+		return;
 	}
 
 	// Read fragment shader code from file
@@ -35,7 +51,7 @@ GLuint SystemUtils::loadShader(const char* vertexShaderPath, const char* fragmen
 	else
 	{
 		printf("Failed to read fragment shader: %s\n", fragmentShaderPath);
-		return 0;
+		return;
 	}
 
 	GLint ret = GL_FALSE;
@@ -61,7 +77,7 @@ GLuint SystemUtils::loadShader(const char* vertexShaderPath, const char* fragmen
 	if (ret == GL_FALSE)
 	{
 		printf("Error compiling vertex shader: %s\n", vertexShaderPath);
-		return 0;
+		return;
 	}
 
 	// Compile Fragment Shader
@@ -84,12 +100,12 @@ GLuint SystemUtils::loadShader(const char* vertexShaderPath, const char* fragmen
 	if(ret == GL_FALSE)
 	{
 		printf("Error compiling fragment shader: %s\n", fragmentShaderPath);
-		return 0;
+		return;
 	}
 
 	// Link the program
 	printf("Linking program\n");
-	GLuint programId = glCreateProgram();
+	programId = glCreateProgram();
 	glAttachShader(programId, vertexShaderId);
 	glAttachShader(programId, fragmentShaderId);
 	glLinkProgram(programId);
@@ -108,7 +124,7 @@ GLuint SystemUtils::loadShader(const char* vertexShaderPath, const char* fragmen
 	if (ret == GL_FALSE)
 	{
 		printf("Erorr linking the program\n");
-		return 0;
+		return;
 	}
 
 	//glDetachShader(programId, vertexShaderId);
@@ -118,6 +134,21 @@ GLuint SystemUtils::loadShader(const char* vertexShaderPath, const char* fragmen
 	//glDeleteShader(fragmentShaderId);
 
 	printf("Program linked successfully\n");
+}
 
-	return programId;
+void GLShader::use()
+{
+	glUseProgram(programId);
+}
+
+void GLShader::setUniformMat4(const char* name, mat4& value)
+{
+	GLuint uniformId = glGetUniformLocation(this->programId, name);
+
+	glUniformMatrix4fv(uniformId, 1, GL_FALSE, glm::value_ptr(value));
+}
+
+GLuint GLShader::getAttribLocation(const char* attribute)
+{
+	return glGetAttribLocation(this->programId, attribute);
 }

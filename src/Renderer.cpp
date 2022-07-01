@@ -8,7 +8,7 @@ Renderer::Renderer() :
 	TCBO(-1),
 	EBO(-1),
 	VAO(-1),
-	programId(0),
+	projectionMatrix(1),
 	clear_color(0),
 	positions(),
 	indicies(),
@@ -42,8 +42,20 @@ void Renderer::init()
 		clear_color.w
 	);
 
+	// Set projection matrix
+	projectionMatrix = glm::perspective(
+		glm::radians(90.0f),
+		4.0f / 3.0f,
+		0.1f,
+		100.0f
+	);
+}
+
+void Renderer::setShaderProgram(GLShader* shaderProgram)
+{
 	// Set shader program
-	programId = SystemUtils::loadShader("shader/headVertexShader.glsl", "shader/headFragmentShader.glsl");
+	//programId = SystemUtils::loadShader("shader/headVertexShader.glsl", "shader/headFragmentShader.glsl");
+	this->shaderProgram = shaderProgram;
 }
 
 void Renderer::draw()
@@ -51,21 +63,14 @@ void Renderer::draw()
 	/* Render here */
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glUseProgram(programId);
+	shaderProgram->use();
 
-	//glBindVertexArray(VAO);
+	glBindVertexArray(VAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
-	glVertexAttribPointer(
-		0,
-		3,
-		GL_FLOAT,
-		GL_FALSE,
-		0,
-		(void*)0
-	);
+	shaderProgram->setUniformMat4("projectionMatrix", projectionMatrix);
 
 	for (RendObj renderObject : rendObjs)
 	{
@@ -115,6 +120,18 @@ void Renderer::addObject(Mesh* mesh)
 		positions.size() * sizeof(vec3),
 		positions.data(),
 		GL_STATIC_DRAW);
+
+	// Positions Attributions
+	GLuint posAttri = shaderProgram->getAttribLocation("position");
+	glVertexAttribPointer(
+		posAttri,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0
+	);
+	glEnableVertexArrayAttrib(VAO, posAttri);
 	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(

@@ -1,6 +1,7 @@
 #pragma once
 #include "Types.h"
 
+#include "GLShader.h"
 #include "Mesh.h"
 #include "Model.h"
 
@@ -22,7 +23,9 @@ private:
 
 	GLuint VAO;				// Vertex Array Pointer
 
-	GLuint programId;
+	GLShader *shaderProgram;
+
+	mat4 projectionMatrix;
 
 	std::vector<glm::vec3> positions;
 	std::vector<u32> indicies;
@@ -37,6 +40,8 @@ public:
 	~Renderer();
 
 	void init();
+	void setShaderProgram(GLShader* shaderProgram);
+
 	void draw();
 
 	void genGLBuffers();

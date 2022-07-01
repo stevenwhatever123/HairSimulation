@@ -2,6 +2,8 @@
 
 layout(location = 0) in vec3 position;
 
+uniform mat4 projectionMatrix;
+
 void main()
 {
 	// Model Matrix
@@ -12,18 +14,8 @@ void main()
 	translationMatrix[3][3] = 1;
 
 	translationMatrix[3][0] = 0;
-	translationMatrix[3][1] = -20;
+	translationMatrix[3][1] = 0;
 	translationMatrix[3][2] = -50;
-
-	// Projection Matrix
-	//mat4 projectionMatrix = perspective(
-	//	radians(90.0f),
-	//	4.0f/3.0f,
-	//	0.1f,
-	//	100.0f
-	//);
-	
-
 
 	gl_Position = translationMatrix * vec4(position, 1);
 }

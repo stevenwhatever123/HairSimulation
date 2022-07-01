@@ -21,6 +21,7 @@
 // GLM
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 // Assimp
 #include <assimp/Importer.hpp>

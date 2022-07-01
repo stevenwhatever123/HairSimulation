@@ -1,7 +1,6 @@
 #include <pch.h>
 
 #include <Managers/SystemManager.h>
-#include <Renderer.h>
 
 SystemManager::SystemManager() : keys()
 {
@@ -12,6 +11,7 @@ SystemManager::SystemManager() : keys()
 void SystemManager::init()
 {
     init_window();
+    init_shaders();
     init_renderer();
 }
 
@@ -87,9 +87,20 @@ void SystemManager::init_window()
     glfwSetKeyCallback(window, key_callback);
 }
 
+void SystemManager::init_shaders()
+{
+    GLShader* shaderProgram = new GLShader();
+    shaderProgram->loadShader("shader/headVertexShader.glsl", "shader/headFragmentShader.glsl");
+
+    shaderPrograms.emplace_back(shaderProgram);
+
+    currentProgram = shaderPrograms[0];
+}
+
 void SystemManager::init_renderer()
 {
     renderer = new Renderer();
+    renderer->setShaderProgram(currentProgram);
 }
 
 void SystemManager::update()

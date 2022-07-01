@@ -1,6 +1,7 @@
 #pragma once
 #include <Managers/FileManager.h>
 #include <Utils/ModelLoader.h>
+#include <GLShader.h>
 #include <Renderer.h>
 
 class SystemManager
@@ -8,6 +9,10 @@ class SystemManager
 private:
 	GLFWwindow* window;
 	Renderer* renderer;
+
+	std::vector<GLShader*> shaderPrograms;
+
+	GLShader* currentProgram;
 
 public:
 
@@ -17,6 +22,7 @@ public:
 	// Initialise
 	void init();
 	void init_window();
+	void init_shaders();
 	void init_renderer();
 
 	// Updates
