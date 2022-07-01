@@ -2,6 +2,7 @@
 #include "Types.h"
 
 #include "Mesh.h"
+#include "Model.h"
 
 struct RendObj
 {
@@ -41,12 +42,11 @@ public:
 	void genGLBuffers();
 
 	void addObject(Mesh *mesh);
+	void addMeshScene(Model* meshScene);
 
 	// Update variables
 	void update_clear_color(vec4 color);
 
 	// Getters
-	GLint getPositionSizeInGpu() const;
-	GLint getIndiciesSizeInGpu() const;
 };
 

@@ -119,6 +119,18 @@ void Renderer::addObject(Mesh* mesh)
 	std::cout << "Hello, I'm inside the renderer" << "\n";
 }
 
+void Renderer::addMeshScene(Model* meshScene)
+{
+	for (Mesh* mesh : meshScene->meshes)
+	{
+		addObject(mesh);
+	}
+
+	// Clear mesh data from cpu
+	positions.clear();
+	indicies.clear();
+}
+
 void Renderer::update_clear_color(vec4 color)
 {
 	clear_color.x = 0.0f;	// R

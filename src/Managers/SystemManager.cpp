@@ -157,11 +157,13 @@ void SystemManager::update_inputs()
                 std::cout << "===============================" << "\n";
             }
 
+            renderer->addMeshScene(modelScene);
+
+            // Clear mesh data from cpu
             for (Mesh* mesh : modelScene->meshes)
             {
-                renderer->addObject(mesh);
+                delete mesh;
             }
-
             modelScene->meshes.clear();
         }
         else

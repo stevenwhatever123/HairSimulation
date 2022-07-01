@@ -3,7 +3,7 @@
 #include "Mesh.h"
 
 Mesh::Mesh() :
-	name(),
+	name(""),
 	positions(),
 	normals(),
 	texCoords(),
