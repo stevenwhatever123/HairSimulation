@@ -1,8 +1,15 @@
 #include <pch.h>
 
 #include <Managers/SystemManager.h>
+#include <Camera.h>
 
-SystemManager::SystemManager() : keys()
+SystemManager::SystemManager() : 
+    keys(),
+    left_mouse_clicked(0),
+    right_mouse_clicked(0),
+    mouseX(0),
+    mouseY(0),
+    modelRotation(0)
 {
     window = nullptr;
     closeWindow = false;
@@ -70,7 +77,7 @@ void SystemManager::init_window()
     printf("OpenGL version: %s\n", glGetString(GL_VERSION));
 
     // Keyboard handler
-    auto key_callback = [](GLFWwindow* window, int key, int scancode, int action, int mods)
+    auto key_callback = [](GLFWwindow* window, i32 key, i32 scancode, i32 action, i32 mods)
     {
         glfwGetWindowUserPointer(window);
 
@@ -83,8 +90,50 @@ void SystemManager::init_window()
 
         if (key == GLFW_KEY_ESCAPE) system->closeWindow = true;
     };
-
     glfwSetKeyCallback(window, key_callback);
+
+    // Mouse key handler
+    auto mouse_key_callback = [](GLFWwindow* window, i32 key, i32 action, i32 mods)
+    {
+        glfwGetWindowUserPointer(window);
+
+        SystemManager* system = (SystemManager*)glfwGetWindowUserPointer(window);
+        if (key == GLFW_MOUSE_BUTTON_LEFT)
+        {
+            if (action == GLFW_PRESS) system->left_mouse_clicked = 1;
+            else if (action == GLFW_RELEASE) system->left_mouse_clicked = 0;
+        }
+        if (key == GLFW_MOUSE_BUTTON_RIGHT)
+        {
+            if (action == GLFW_PRESS) system->right_mouse_clicked = 1;
+            else if (action == GLFW_RELEASE) system->right_mouse_clicked = 0;
+        }
+    };
+    glfwSetMouseButtonCallback(window, mouse_key_callback);
+    
+    // Mouse movement handler
+    auto mouse_pos_callback = [](GLFWwindow* window, double xpos, double ypos)
+    {
+        glfwGetWindowUserPointer(window);
+
+        SystemManager* system = (SystemManager*)glfwGetWindowUserPointer(window);
+
+        if (system->right_mouse_clicked)
+        {
+            double lastMouseX = system->mouseX;
+            double lastMouseY = system->mouseY;
+
+            double rotateX = xpos - lastMouseX;
+            double rotateY = ypos - lastMouseY;
+
+            system->modelRotation.x += rotateX;
+            system->modelRotation.y += rotateY;
+        }
+
+        system->mouseX = xpos;
+        system->mouseY = ypos;
+    };
+    glfwSetCursorPosCallback(window, mouse_pos_callback);
 }
 
 void SystemManager::init_shaders()
@@ -99,7 +148,13 @@ void SystemManager::init_shaders()
 
 void SystemManager::init_renderer()
 {
-    renderer = new Renderer();
+    Camera* camera = new Camera(vec3(0), vec3(0, 0, -1));
+
+    renderer = new Renderer(width, height, camera);
+    
+    glfwGetFramebufferSize(window, &width, &height);
+
+    renderer->setFramebufferSize(width, height);
     renderer->setShaderProgram(currentProgram);
 }
 
@@ -114,6 +169,7 @@ void SystemManager::update()
         glfwTerminate();
     }
 
+    update_camera();
     update_renderer();
 
     glfwSwapBuffers(window);
@@ -124,72 +180,98 @@ void SystemManager::update_inputs()
     /* Poll for and process events */
     glfwPollEvents();
 
-    if (keys['L'])
-    {
-        bool readSuccess;
-        std::string modelFilename;
-        std::string materialFilename;
-        std::tie(readSuccess, modelFilename) = SystemUtils::selectFile();
+    if (keys['W']) { renderer->getCamera()->moveForward(0.01f); }
+    if (keys['S']) { renderer->getCamera()->moveForward(-0.01f); }
+    if (keys['A']) { renderer->getCamera()->moveRight(-0.01f); }
+    if (keys['D']) { renderer->getCamera()->moveRight(0.01f); }
+    if (keys['Q']) { renderer->getCamera()->moveUp(0.01f); }
+    if (keys['E']) { renderer->getCamera()->moveUp(-0.01f); }
 
-        bool materialReadSuccess = false;
-        materialFilename = modelFilename.substr(0, modelFilename.find_last_of('.')) + ".mtl";
-        if (std::filesystem::exists(materialFilename)) materialReadSuccess = true;
+    if (keys['L']) { loadModel(); }
+}
 
-        if (readSuccess)
-        {
-            std::cout << "Success reading: " << modelFilename << "\n";
-            Model* modelScene = SystemUtils::readModel(modelFilename.c_str());
-            std::cout << "Nubmer of Meshes: " << modelScene->meshes.size() << "\n";
-
-            if (materialReadSuccess)
-                std::cout << "Material Read Successfully!" << "\n";
-            else
-                std::cout << "Error: Cannot find: " << materialFilename << "\n";
-
-            for (u32 i = 0; i < modelScene->meshes.size(); i++)
-            {
-                std::cout << "Mesh " << i << "\n";
-                std::cout << "Name: " << modelScene->meshes[i]->name << "\n";
-                std::cout << "Primitive type: " << 
-                    modelScene->meshes[i]->primitive_type << "\n";
-                std::cout << "Material index: " << 
-                    modelScene->meshes[i]->material_index << "\n";
-                std::cout << "===============================" << "\n";
-            }
-
-            for (u32 i = 0; i < modelScene->materials.size(); i++)
-            {
-                std::cout << "Material " << i << "\n";
-                std::cout << "Name: " << modelScene->materials[i]->name << "\n";
-                std::cout << "Color: " << 
-                    glm::to_string(modelScene->materials[i]->color) << "\n";
-                std::cout << "Has Texture: " << modelScene->materials[i]->has_texture << "\n";
-                std::cout << "Texture Name: " << modelScene->materials[i]->texture_name << "\n";
-                std::cout << "===============================" << "\n";
-            }
-
-            renderer->addMeshScene(modelScene);
-
-            // Clear mesh data from cpu
-            for (Mesh* mesh : modelScene->meshes)
-            {
-                delete mesh;
-            }
-            modelScene->meshes.clear();
-        }
-        else
-        {
-            std::cout << "Error reading: " << modelFilename << "\n";
-        }
-    }
+void SystemManager::update_camera()
+{
+    renderer->getCamera()->updateTransformation();
 }
 
 void SystemManager::update_renderer()
 {
+    glfwGetFramebufferSize(window, &width, &height);
+
+    renderer->setFramebufferSize(width, height);
+
+    renderer->set_all_rendObj_rotation(modelRotation);
+
     renderer->draw();
 }
 
 void SystemManager::readFile()
 {
     SystemUtils::selectFile();
+}
+
+void SystemManager::loadModel()
+{
+    bool readSuccess;
+    std::string modelFilename;
+    std::string materialFilename;
+    std::tie(readSuccess, modelFilename) = SystemUtils::selectFile();
+
+    bool materialReadSuccess = false;
+    materialFilename = modelFilename.substr(0, modelFilename.find_last_of('.')) + ".mtl";
+    if (std::filesystem::exists(materialFilename)) materialReadSuccess = true;
+
+    if (readSuccess)
+    {
+        printf("===============================\n");
+
+        printf("Success reading: %s\n", modelFilename.c_str());
+
+        Model* modelScene = SystemUtils::readModel(modelFilename.c_str());
+
+        if (materialReadSuccess)
+            printf("Material Read Successfully!\n");
+        else
+            printf("Error: Cannot find: %s\n", materialFilename.c_str());
+
+        printModelDetails(*modelScene);
+
+        renderer->addMeshScene(modelScene);
+
+        // Clear mesh data from cpu
+        for (Mesh* mesh : modelScene->meshes)
+        {
+            delete mesh;
+        }
+        modelScene->meshes.clear();
+    }
+    else
+    {
+        std::cout << "Error reading: " << modelFilename << "\n";
+    }
+}
+
+void SystemManager::printModelDetails(const Model& modelScene)
+{
+    printf("Nubmer of Meshes: %i\n", modelScene.meshes.size());
+
+    for (u32 i = 0; i < modelScene.meshes.size(); i++)
+    {
+        printf("Mesh %i\n", i);
+        printf("Name: %s\n", modelScene.meshes[i]->name.c_str());
+        printf("Primitive type: %i\n", modelScene.meshes[i]->primitive_type);
+        printf("Material index: %i\n", modelScene.meshes[i]->material_index);
+        printf("===============================\n");
+    }
+
+    for (u32 i = 0; i < modelScene.materials.size(); i++)
+    {
+        printf("Material %i\n", i);
+        printf("Name: %s\n", modelScene.materials[i]->name.c_str());
+        printf("Color: %s\n", glm::to_string(modelScene.materials[i]->color).c_str());
+        printf("Has Texture: %i\n", modelScene.materials[i]->has_texture);
+        printf("Texture Name: %s\n", modelScene.materials[i]->texture_name.c_str());
+        printf("===============================\n");
+    }
 }

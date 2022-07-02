@@ -1,21 +1,20 @@
 #version 450 core
 
 layout(location = 0) in vec3 position;
+layout(location = 1) in vec3 normal;
+layout(location = 2) in vec2 texCoord;
 
+layout(location = 0) out vec3 oNormal;
+layout(location = 1) out vec2 oTexCoord;
+
+uniform mat4 modelMatrix;
+uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 
 void main()
 {
-	// Model Matrix
-	mat4 translationMatrix;
-	translationMatrix[0][0] = 1;
-	translationMatrix[1][1] = 1;
-	translationMatrix[2][2] = 1;
-	translationMatrix[3][3] = 1;
+	oNormal = vec3(modelMatrix * vec4(normal, 1));
+	oTexCoord = texCoord;
 
-	translationMatrix[3][0] = 0;
-	translationMatrix[3][1] = 0;
-	translationMatrix[3][2] = -50;
-
-	gl_Position = translationMatrix * vec4(position, 1);
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1);
 }

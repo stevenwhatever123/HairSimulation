@@ -127,11 +127,11 @@ void GLShader::loadShader(const char* vertexShaderPath, const char* fragmentShad
 		return;
 	}
 
-	//glDetachShader(programId, vertexShaderId);
-	//glDetachShader(programId, fragmentShaderId);
+	glDetachShader(programId, vertexShaderId);
+	glDetachShader(programId, fragmentShaderId);
 
-	//glDeleteShader(vertexShaderId);
-	//glDeleteShader(fragmentShaderId);
+	glDeleteShader(vertexShaderId);
+	glDeleteShader(fragmentShaderId);
 
 	printf("Program linked successfully\n");
 }
@@ -141,7 +141,7 @@ void GLShader::use()
 	glUseProgram(programId);
 }
 
-void GLShader::setUniformMat4(const char* name, mat4& value)
+void GLShader::setUniformMat4(const char* name, const mat4& value)
 {
 	GLuint uniformId = glGetUniformLocation(this->programId, name);
 

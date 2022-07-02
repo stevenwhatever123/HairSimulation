@@ -19,7 +19,7 @@ public:
 
 	// Command funtions
 	void use();
-	void setUniformMat4(const char* name, mat4& value);
+	void setUniformMat4(const char* name, const mat4& value);
 
 	// Getters
 	GLuint getAttribLocation(const char* attribute);

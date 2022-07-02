@@ -6,7 +6,6 @@ Model* SystemUtils::readModel(const char* filename)
 	Assimp::Importer importer;
 
 	const aiScene* pScene = importer.ReadFile(filename,
-		aiProcess_Triangulate |
 		aiProcess_GenSmoothNormals |
 		aiProcess_JoinIdenticalVertices);
 
