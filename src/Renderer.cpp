@@ -44,7 +44,7 @@ void Renderer::init()
 		glm::radians(90.0f),
 		4.0f/ 3.0f,
 		0.1f,
-		100.0f
+		1000.0f
 	);
 }
 
@@ -239,7 +239,9 @@ void Renderer::addMaterial(Material* material)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, material->width, material->height, 0, GL_RGB, GL_UNSIGNED_BYTE, material->texture_image->data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, material->width, material->height, 0, 
+			(material->numChannels == 3) ? GL_RGB: GL_RGBA, GL_UNSIGNED_BYTE, 
+			material->texture_image->data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		material->freeTextureImage();

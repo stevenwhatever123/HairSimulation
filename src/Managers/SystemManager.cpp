@@ -148,7 +148,7 @@ void SystemManager::init_shaders()
 
 void SystemManager::init_renderer()
 {
-    Camera* camera = new Camera(vec3(0), vec3(0, 0, -1));
+    Camera* camera = new Camera(vec3(0, 0, 0), vec3(0, 0, -1));
 
     renderer = new Renderer(width, height, camera);
     

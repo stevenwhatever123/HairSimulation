@@ -6,6 +6,7 @@ Model* SystemUtils::readModel(const char* filename)
 	Assimp::Importer importer;
 
 	const aiScene* pScene = importer.ReadFile(filename,
+		aiProcess_Triangulate |
 		aiProcess_GenSmoothNormals |
 		aiProcess_JoinIdenticalVertices);
 
@@ -75,7 +76,8 @@ Model* SystemUtils::extractScene(const aiScene* pScene)
 			face++;
 		}
 
-		mesh->primitive_type = pMesh->mPrimitiveTypes;
+		//mesh->primitive_type = pMesh->mPrimitiveTypes;
+		mesh->primitive_type = GL_TRIANGLES;
 		mesh->material_index = pMesh->mMaterialIndex;
 
 		meshScene->meshes[i] = mesh;

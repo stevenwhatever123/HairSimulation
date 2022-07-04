@@ -20,7 +20,7 @@ struct RendObj
 
 	u32 material_index;
 
-	mat4 getTransformation() { return translation* rotation* scaling; }
+	mat4 getTransformation() { return this->translation * this->rotation * this->scaling; }
 };
 
 class Renderer
