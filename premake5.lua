@@ -44,6 +44,7 @@ project "HairSimulation"
 		"libraries/assimp/include",
 		"libraries/glm/",
 		"libraries/glad/include",
+		"libraries/stb/"
 	}
 
 	dependson

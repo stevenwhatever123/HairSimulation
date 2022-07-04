@@ -119,10 +119,26 @@ Model* SystemUtils::extractScene(const aiScene* pScene)
 			material->color.x = color.r;
 			material->color.y = color.g;
 			material->color.z = color.b;
+			material->color.w = 1.0f;
+
+			if (material->has_texture)
+			{
+				// Texture
+				loadTexture(material);
+			}
 
 			meshScene->materials[i] = material;
 		}
 	}
 
 	return meshScene;
+}
+
+void SystemUtils::loadTexture(Material* pMaterial)
+{
+	Image* image = new Image();
+	image->readImage(pMaterial->texture_name.c_str(),
+		pMaterial->width, pMaterial->height, pMaterial->numChannels);
+
+	pMaterial->setTextureImage(image);
 }

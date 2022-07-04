@@ -118,7 +118,7 @@ void SystemManager::init_window()
 
         SystemManager* system = (SystemManager*)glfwGetWindowUserPointer(window);
 
-        if (system->right_mouse_clicked)
+        if (system->left_mouse_clicked)
         {
             double lastMouseX = system->mouseX;
             double lastMouseY = system->mouseY;
@@ -184,8 +184,8 @@ void SystemManager::update_inputs()
     if (keys['S']) { renderer->getCamera()->moveForward(-0.01f); }
     if (keys['A']) { renderer->getCamera()->moveRight(-0.01f); }
     if (keys['D']) { renderer->getCamera()->moveRight(0.01f); }
-    if (keys['Q']) { renderer->getCamera()->moveUp(0.01f); }
-    if (keys['E']) { renderer->getCamera()->moveUp(-0.01f); }
+    if (keys['E']) { renderer->getCamera()->moveUp(0.01f); }
+    if (keys['Q']) { renderer->getCamera()->moveUp(-0.01f); }
 
     if (keys['L']) { loadModel(); }
 }
@@ -244,7 +244,14 @@ void SystemManager::loadModel()
         {
             delete mesh;
         }
+        // Clear material data from gpu
+        for (Material* material : modelScene->materials)
+        {
+            delete material;
+        }
+
         modelScene->meshes.clear();
+        modelScene->materials.clear();
     }
     else
     {

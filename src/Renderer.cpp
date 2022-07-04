@@ -10,6 +10,7 @@ Renderer::Renderer(int width, int height, Camera* camera) :
 	NBO(-1),
 	TCBO(-1),
 	EBO(-1),
+	UBO(-1),
 	VAO(-1),
 	projectionMatrix(1),
 	clear_color(0),
@@ -33,6 +34,8 @@ void Renderer::init()
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 	glDepthMask(GL_TRUE);
+
+	glDepthFunc(GL_LESS);
 
 	set_clear_color(vec4(0.4f, 0.4f, 0.4f, 1));
 
@@ -92,6 +95,10 @@ void Renderer::draw()
 	{
 		shaderProgram->setUniformMat4("modelMatrix", renderObject.getTransformation());
 
+		shaderProgram->setUniformMaterial(UBO, rendMaterials[renderObject.material_index]);
+
+		glBindTexture(GL_TEXTURE_2D, materials[renderObject.material_index].texture_id);
+
 		glDrawElements(
 			renderObject.primitive, 
 			renderObject.endIndex - renderObject.startIndex, 
@@ -107,17 +114,29 @@ void Renderer::genGLBuffers()
 	glGenBuffers(1, &TCBO);
 	glGenBuffers(1, &EBO);
 
+	glGenBuffers(1, &UBO);
+
+	// Allocate memory for uniform buffer
+	glBindBuffer(GL_UNIFORM_BUFFER, UBO);
+	glBufferData(GL_UNIFORM_BUFFER, 32, NULL, GL_STATIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	glBindBufferRange(GL_UNIFORM_BUFFER, 0, UBO, 0, sizeof(MaterialUniform));
+
 	glGenVertexArrays(1, &VAO);
 }
 
 void Renderer::addObject(Mesh* mesh)
 {
-	RendObj renderObject;
+	RendObj renderObject{};
 	renderObject.translation = mat4(1);
 	renderObject.rotation = mat4(1);
 	renderObject.scaling = mat4(1);
 	renderObject.startIndex = indicies.size();
 	renderObject.primitive = mesh->primitive_type;
+
+	const u32 currentMaterialSize = rendMaterials.size();
+	renderObject.material_index = currentMaterialSize + mesh->material_index;
 
 	const u32 currentVerticesSize = positions.size();
 
@@ -205,6 +224,31 @@ void Renderer::addObject(Mesh* mesh)
 	);
 }
 
+void Renderer::addMaterial(Material* material)
+{
+	MaterialUniform rendMaterial = material->getMaterialUniform();
+
+	if (material->has_texture)
+	{
+		// Upload texture to gpu
+		glGenTextures(1, &material->texture_id);
+		glBindTexture(GL_TEXTURE_2D, material->texture_id);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, material->width, material->height, 0, GL_RGB, GL_UNSIGNED_BYTE, material->texture_image->data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		material->freeTextureImage();
+	}
+
+	rendMaterials.push_back(rendMaterial);
+	materials.push_back(*material);
+}
+
 void Renderer::addMeshScene(Model* meshScene)
 {
 	for (Mesh* mesh : meshScene->meshes)
@@ -212,8 +256,15 @@ void Renderer::addMeshScene(Model* meshScene)
 		addObject(mesh);
 	}
 
+	for (Material* material : meshScene->materials)
+	{
+		addMaterial(material);
+	}
+
 	// Clear mesh data from cpu
 	positions.clear();
+	normals.clear();
+	texCoords.clear();
 	indicies.clear();
 }
 

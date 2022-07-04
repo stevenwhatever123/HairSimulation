@@ -5,6 +5,7 @@
 #include "GLShader.h"
 #include "Mesh.h"
 #include "Model.h"
+#include "Material.h"
 
 struct RendObj
 {
@@ -16,6 +17,8 @@ struct RendObj
 	mat4 scaling;
 
 	u32 primitive;
+
+	u32 material_index;
 
 	mat4 getTransformation() { return translation* rotation* scaling; }
 };
@@ -31,18 +34,23 @@ private:
 	GLuint TCBO;			// Texture Coordinate Buffer Object
 	GLuint EBO;				// Element Array Buffer Object
 
+	GLuint UBO;				// Uniform buffer
+
 	GLuint VAO;				// Vertex Array Pointer
 
 	GLShader *shaderProgram;
 
 	mat4 projectionMatrix;
 
-	std::vector<glm::vec3> positions;
-	std::vector<glm::vec3> normals;
-	std::vector<glm::vec2> texCoords;
+	std::vector<vec3> positions;
+	std::vector<vec3> normals;
+	std::vector<vec2> texCoords;
 	std::vector<u32> indicies;
 
 	std::vector<RendObj> rendObjs;
+	std::vector<MaterialUniform> rendMaterials;
+
+	std::vector<Material> materials;
 
 public:
 
@@ -62,6 +70,7 @@ public:
 	void genGLBuffers();
 
 	void addObject(Mesh *mesh);
+	void addMaterial(Material* material);
 	void addMeshScene(Model* meshScene);
 
 	// Set variables

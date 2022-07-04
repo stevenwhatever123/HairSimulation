@@ -1,6 +1,8 @@
 #pragma once
 #include "Types.h"
 
+#include "Material.h"
+
 class GLShader
 {
 private:
@@ -20,6 +22,7 @@ public:
 	// Command funtions
 	void use();
 	void setUniformMat4(const char* name, const mat4& value);
+	void setUniformMaterial(GLuint uniformIndex, const MaterialUniform &rendMaterial);
 
 	// Getters
 	GLuint getAttribLocation(const char* attribute);

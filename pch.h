@@ -1,5 +1,9 @@
 #pragma once
 
+// stb
+//#define STB_IMAGE_IMPLEMENTATION
+//#include "stb_image.h"
+
 // C++ library
 #include <iostream>
 #include <vector>

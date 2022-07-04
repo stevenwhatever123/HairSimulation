@@ -9,4 +9,6 @@ namespace SystemUtils
 {
 	Model* readModel(const char* filename);
 	Model* extractScene(const aiScene* pScene);
+
+	void loadTexture(Material* pMaterial);
 }

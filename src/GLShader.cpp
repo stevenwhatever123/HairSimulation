@@ -148,6 +148,19 @@ void GLShader::setUniformMat4(const char* name, const mat4& value)
 	glUniformMatrix4fv(uniformId, 1, GL_FALSE, glm::value_ptr(value));
 }
 
+void GLShader::setUniformMaterial(GLuint uniformIndex, const MaterialUniform& rendMaterial)
+{	
+	glBindBuffer(GL_UNIFORM_BUFFER, uniformIndex);
+
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(MaterialUniform), &rendMaterial);
+
+	//glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(bool), &rendMaterial.has_texture);
+	//glBufferSubData(GL_UNIFORM_BUFFER, 4 * 4, sizeof(vec4), &rendMaterial.color[0]);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+}
+
 GLuint GLShader::getAttribLocation(const char* attribute)
 {
 	return glGetAttribLocation(this->programId, attribute);
