@@ -7,6 +7,7 @@ Model* SystemUtils::readModel(const char* filename)
 
 	const aiScene* pScene = importer.ReadFile(filename,
 		aiProcess_Triangulate |
+		aiProcess_FlipUVs |
 		aiProcess_GenSmoothNormals |
 		aiProcess_JoinIdenticalVertices);
 
