@@ -256,15 +256,15 @@ void SystemManager::loadModel()
             if (mesh->isSkull)
             {
                 hairManager->generateHairRoots(mesh);
-
-                Mesh* hairRootMesh = hairManager->getHairRootAsMeshes();
-
-                renderer->addObject(hairRootMesh);
-
-                // Clear data
-                delete hairRootMesh;
             }
         }
+
+        Mesh* hairRootMesh = hairManager->getHairRootAsMeshes();
+
+        renderer->addObject(hairRootMesh);
+
+        // Clear data
+        delete hairRootMesh;
 
         renderer->addMeshScene(modelScene);
 

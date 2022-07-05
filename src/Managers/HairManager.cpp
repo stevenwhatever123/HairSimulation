@@ -17,6 +17,11 @@ HairManager::~HairManager()
 
 void HairManager::generateHairRoots(const Mesh *mesh)
 {
+	int currentIndiciesSize = hairRootIndicies.size();
+
+	//if (mesh->positions.size() > 500)
+	//	return;
+
 	for (u32 i = 0; i < mesh->indicies.size() - 3; i+=3)
 	{
 		// Get the middle point of the face
@@ -41,7 +46,8 @@ void HairManager::generateHairRoots(const Mesh *mesh)
 		hairRootPositions.push_back(v);
 		hairRootNormals.push_back(n);
 		hairRootTexCoords.push_back(tc);
-		hairRootIndicies.push_back(i / 3.0f);
+		//hairRootIndicies.push_back((i / 3.0f));
+		hairRootIndicies.push_back(currentIndiciesSize + (i / 3.0f));
 	}
 
 	printf("Generated %i hair roots\n", hairRootPositions.size());
