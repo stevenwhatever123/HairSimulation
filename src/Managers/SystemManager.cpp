@@ -19,6 +19,7 @@ void SystemManager::init()
 {
     init_window();
     init_shaders();
+    init_hair_manager();
     init_renderer();
 }
 
@@ -138,12 +139,24 @@ void SystemManager::init_window()
 
 void SystemManager::init_shaders()
 {
-    GLShader* shaderProgram = new GLShader();
-    shaderProgram->loadShader("shader/headVertexShader.glsl", "shader/headFragmentShader.glsl");
+    // The mesh shader      - 0
+    GLShader* meshShaderProgram = new GLShader();
+    meshShaderProgram->loadShader("shader/headVertexShader.glsl", "shader/headFragmentShader.glsl");
 
-    shaderPrograms.emplace_back(shaderProgram);
+    shaderPrograms.emplace_back(meshShaderProgram);
 
     currentProgram = shaderPrograms[0];
+
+    // The hair root shader     - 1
+    GLShader* hairRootShaderProgram = new GLShader();
+    hairRootShaderProgram->loadShader("shader/hairRootVertexShader.glsl", "shader/hairRootFragmentShader.glsl");
+
+    shaderPrograms.emplace_back(hairRootShaderProgram);
+}
+
+void SystemManager::init_hair_manager()
+{
+    hairManager = new HairManager();
 }
 
 void SystemManager::init_renderer()
@@ -155,7 +168,8 @@ void SystemManager::init_renderer()
     glfwGetFramebufferSize(window, &width, &height);
 
     renderer->setFramebufferSize(width, height);
-    renderer->setShaderProgram(currentProgram);
+
+    renderer->addShaderPrograms(shaderPrograms);
 }
 
 void SystemManager::update()
@@ -224,7 +238,7 @@ void SystemManager::loadModel()
 
     if (readSuccess)
     {
-        printf("===============================\n");
+        //printf("===============================\n");
 
         printf("Success reading: %s\n", modelFilename.c_str());
 
@@ -235,7 +249,22 @@ void SystemManager::loadModel()
         else
             printf("Error: Cannot find: %s\n", materialFilename.c_str());
 
-        printModelDetails(*modelScene);
+        //printModelDetails(*modelScene);
+
+        for (Mesh* mesh : modelScene->meshes)
+        {
+            if (mesh->isSkull)
+            {
+                hairManager->generateHairRoots(mesh);
+
+                Mesh* hairRootMesh = hairManager->getHairRootAsMeshes();
+
+                renderer->addObject(hairRootMesh);
+
+                // Clear data
+                delete hairRootMesh;
+            }
+        }
 
         renderer->addMeshScene(modelScene);
 

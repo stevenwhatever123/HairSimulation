@@ -1,9 +1,11 @@
 #pragma once
 #include <Managers/FileManager.h>
+#include <Managers/HairManager.h>
 #include <Utils/ModelLoader.h>
 #include <GLShader.h>
 #include <Renderer.h>
 #include <Model.h>
+
 
 class SystemManager
 {
@@ -19,6 +21,9 @@ private:
 
 	GLShader* currentProgram;
 
+	// Hair Manager for this project
+	HairManager* hairManager;
+
 public:
 	// For the model matrix
 	vec3 modelRotation;
@@ -32,6 +37,7 @@ public:
 	void init();
 	void init_window();
 	void init_shaders();
+	void init_hair_manager();
 	void init_renderer();
 
 	// Updates

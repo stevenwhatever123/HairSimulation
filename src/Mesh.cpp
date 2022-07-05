@@ -4,6 +4,9 @@
 
 Mesh::Mesh() :
 	name(""),
+	isMesh(false),
+	isSkull(false),
+	isHairRoot(false),
 	positions(),
 	normals(),
 	texCoords(),

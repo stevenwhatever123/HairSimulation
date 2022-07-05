@@ -20,6 +20,9 @@ struct RendObj
 
 	u32 material_index;
 
+	bool isMesh;
+	bool isHairRoot;
+
 	mat4 getTransformation() { return this->translation * this->rotation * this->scaling; }
 };
 
@@ -38,7 +41,7 @@ private:
 
 	GLuint VAO;				// Vertex Array Pointer
 
-	GLShader *shaderProgram;
+	std::vector<GLShader*> shaderPrograms;
 
 	mat4 projectionMatrix;
 
@@ -63,7 +66,8 @@ public:
 
 	void init();
 	void setFramebufferSize(int width, int height);
-	void setShaderProgram(GLShader* shaderProgram);
+
+	void addShaderPrograms(const std::vector<GLShader*>& shaderPrograms);
 
 	void draw();
 

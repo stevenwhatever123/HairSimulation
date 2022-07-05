@@ -12,6 +12,7 @@ Renderer::Renderer(int width, int height, Camera* camera) :
 	EBO(-1),
 	UBO(-1),
 	VAO(-1),
+	shaderPrograms(),
 	projectionMatrix(1),
 	clear_color(0),
 	positions(),
@@ -34,8 +35,10 @@ void Renderer::init()
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 	glDepthMask(GL_TRUE);
+	glEnable(GL_PROGRAM_POINT_SIZE);
 
-	glDepthFunc(GL_LESS);
+	//glDepthFunc(GL_LESS);
+	glDepthFunc(GL_LEQUAL);
 
 	set_clear_color(vec4(0.4f, 0.4f, 0.4f, 1));
 
@@ -73,10 +76,12 @@ void Renderer::setFramebufferSize(int width, int height)
 	);
 }
 
-void Renderer::setShaderProgram(GLShader* shaderProgram)
+void Renderer::addShaderPrograms(const std::vector<GLShader*>& shaderPrograms)
 {
-	// Set shader program
-	this->shaderProgram = shaderProgram;
+	for (GLShader* program : shaderPrograms)
+	{
+		this->shaderPrograms.emplace_back(program);
+	}
 }
 
 void Renderer::draw()
@@ -84,26 +89,55 @@ void Renderer::draw()
 	/* Render here */
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	shaderProgram->use();
+	GLShader* shaderProgram;
 
 	glBindVertexArray(VAO);
 
-	shaderProgram->setUniformMat4("viewMatrix", camera->getTransformation());
-	shaderProgram->setUniformMat4("projectionMatrix", projectionMatrix);
-
 	for (RendObj &renderObject : rendObjs)
 	{
-		shaderProgram->setUniformMat4("modelMatrix", renderObject.getTransformation());
+		if (renderObject.isMesh)
+		{
+			glDisable(GL_PROGRAM_POINT_SIZE);
+			shaderProgram = shaderPrograms[0];
 
-		shaderProgram->setUniformMaterial(UBO, rendMaterials[renderObject.material_index]);
+			shaderProgram->use();
 
-		glBindTexture(GL_TEXTURE_2D, materials[renderObject.material_index].texture_id);
+			shaderProgram->setUniformMat4("viewMatrix", camera->getTransformation());
+			shaderProgram->setUniformMat4("projectionMatrix", projectionMatrix);
 
-		glDrawElements(
-			renderObject.primitive, 
-			renderObject.endIndex - renderObject.startIndex, 
-			GL_UNSIGNED_INT, 
-			(void*) (renderObject.startIndex * sizeof(u32)));
+			shaderProgram->setUniformMat4("modelMatrix", renderObject.getTransformation());
+
+			shaderProgram->setUniformMaterial(UBO, rendMaterials[renderObject.material_index]);
+
+			glBindTexture(GL_TEXTURE_2D, materials[renderObject.material_index].texture_id);
+
+			glDrawElements(
+				renderObject.primitive,
+				renderObject.endIndex - renderObject.startIndex,
+				GL_UNSIGNED_INT,
+				(void*)(renderObject.startIndex * sizeof(u32)));
+
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+
+		if (renderObject.isHairRoot)
+		{
+			glEnable(GL_PROGRAM_POINT_SIZE);
+			shaderProgram = shaderPrograms[1];
+
+			shaderProgram->use();
+
+			shaderProgram->setUniformMat4("viewMatrix", camera->getTransformation());
+			shaderProgram->setUniformMat4("projectionMatrix", projectionMatrix);
+
+			shaderProgram->setUniformMat4("modelMatrix", renderObject.getTransformation());
+
+			glDrawElements(
+				renderObject.primitive,
+				renderObject.endIndex - renderObject.startIndex,
+				GL_UNSIGNED_INT,
+				(void*)(renderObject.startIndex * sizeof(u32)));
+		}
 	}
 }
 
@@ -134,6 +168,8 @@ void Renderer::addObject(Mesh* mesh)
 	renderObject.scaling = mat4(1);
 	renderObject.startIndex = indicies.size();
 	renderObject.primitive = mesh->primitive_type;
+	renderObject.isMesh = mesh->isMesh;
+	renderObject.isHairRoot = mesh->isHairRoot;
 
 	const u32 currentMaterialSize = rendMaterials.size();
 	renderObject.material_index = currentMaterialSize + mesh->material_index;
@@ -163,6 +199,8 @@ void Renderer::addObject(Mesh* mesh)
 		positions.size() * sizeof(vec3),
 		positions.data(),
 		GL_STATIC_DRAW);
+
+	GLShader* shaderProgram = shaderPrograms[0];
 
 	// Positions Attributions
 	GLuint positionAttri = shaderProgram->getAttribLocation("position");

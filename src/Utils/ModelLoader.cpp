@@ -132,6 +132,17 @@ Model* SystemUtils::extractScene(const aiScene* pScene)
 
 			meshScene->materials[i] = material;
 		}
+
+		// Find which mesh is a skull for hair generation
+		for (Mesh* mesh : meshScene->meshes)
+		{
+			if (meshScene->materials[mesh->material_index]->name.find("skull")
+				!= std::string::npos)
+			{
+				mesh->isSkull = true;
+			}
+			mesh->isMesh = true;
+		}
 	}
 
 	return meshScene;
