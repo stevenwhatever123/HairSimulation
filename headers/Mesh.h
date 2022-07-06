@@ -8,7 +8,10 @@ public:
 
 	bool isMesh;
 	bool isSkull;
-	bool isHairRoot;
+	bool isMassPoint;
+
+	// This will only use when isMassPoint is true
+	u32 mass_point_id;
 
 	std::vector<vec3> positions;
 	std::vector<vec3> normals;

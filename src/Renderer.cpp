@@ -19,7 +19,8 @@ Renderer::Renderer(int width, int height, Camera* camera) :
 	normals(),
 	texCoords(),
 	indicies(),
-	rendObjs()
+	rendObjs(),
+	mass_point_count(0)
 {
 	init();
 	genGLBuffers();
@@ -119,25 +120,26 @@ void Renderer::draw()
 
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
+	}
 
-		if (renderObject.isHairRoot)
-		{
-			glEnable(GL_PROGRAM_POINT_SIZE);
-			shaderProgram = shaderPrograms[1];
+	for (RendMassPoint& renderMassPoint : rendMassPoints)
+	{
+		glEnable(GL_PROGRAM_POINT_SIZE);
+		shaderProgram = shaderPrograms[1];
 
-			shaderProgram->use();
+		shaderProgram->use();
 
-			shaderProgram->setUniformMat4("viewMatrix", camera->getTransformation());
-			shaderProgram->setUniformMat4("projectionMatrix", projectionMatrix);
+		shaderProgram->setUniformVec3("u_position", renderMassPoint.position);
 
-			shaderProgram->setUniformMat4("modelMatrix", renderObject.getTransformation());
+		shaderProgram->setUniformMat4("viewMatrix", camera->getTransformation());
+		shaderProgram->setUniformMat4("projectionMatrix", projectionMatrix);
+		shaderProgram->setUniformMat4("modelMatrix", renderMassPoint.getTransformation());
 
-			glDrawElements(
-				renderObject.primitive,
-				renderObject.endIndex - renderObject.startIndex,
-				GL_UNSIGNED_INT,
-				(void*)(renderObject.startIndex * sizeof(u32)));
-		}
+		glDrawElements(
+			renderMassPoint.primitive,
+			renderMassPoint.endIndex - renderMassPoint.startIndex,
+			GL_UNSIGNED_INT,
+			(void*)(renderMassPoint.startIndex * sizeof(u32)));
 	}
 }
 
@@ -169,7 +171,7 @@ void Renderer::addObject(Mesh* mesh)
 	renderObject.startIndex = indicies.size();
 	renderObject.primitive = mesh->primitive_type;
 	renderObject.isMesh = mesh->isMesh;
-	renderObject.isHairRoot = mesh->isHairRoot;
+	renderObject.isMassPoint = mesh->isMassPoint;
 
 	const u32 currentMaterialSize = rendMaterials.size();
 	renderObject.material_index = currentMaterialSize + mesh->material_index;
@@ -262,6 +264,116 @@ void Renderer::addObject(Mesh* mesh)
 	);
 }
 
+void Renderer::addMassPoint(Mesh* mesh)
+{
+	RendMassPoint renderObject{};
+	renderObject.translation = mat4(1);
+	renderObject.rotation = mat4(1);
+	renderObject.scaling = mat4(1);
+	renderObject.startIndex = indicies.size();
+	renderObject.primitive = mesh->primitive_type;
+	renderObject.isMesh = mesh->isMesh;
+	renderObject.isMassPoint = mesh->isMassPoint;
+	// Mass point has only one position
+	renderObject.position = mesh->positions[0];
+
+	if (renderObject.isMassPoint)
+	{
+		renderObject.mass_point_id = mass_point_count;
+		mass_point_count++;
+	}
+
+	const u32 currentMaterialSize = rendMaterials.size();
+	renderObject.material_index = currentMaterialSize + mesh->material_index;
+
+	const u32 currentVerticesSize = positions.size();
+
+	// Copy vertex position from mesh to the renderer
+	copy(mesh->positions.begin(), mesh->positions.end(), std::back_inserter(positions));
+	// Copy vertex normal from mesh to the renderer
+	copy(mesh->normals.begin(), mesh->normals.end(), std::back_inserter(normals));
+	// Copy texture coordinates from mesh to the renderer
+	copy(mesh->texCoords.begin(), mesh->texCoords.end(), std::back_inserter(texCoords));
+
+	// Copy indicies
+	for (u32 i = 0; i < mesh->indicies.size(); i++)
+	{
+		indicies.push_back(currentVerticesSize + mesh->indicies[i]);
+	}
+
+	renderObject.endIndex = indicies.size();
+
+	rendMassPoints.push_back(renderObject);
+
+	// Position Buffer
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER,
+		positions.size() * sizeof(vec3),
+		positions.data(),
+		GL_STATIC_DRAW);
+
+	GLShader* shaderProgram = shaderPrograms[0];
+
+	// Positions Attributions
+	GLuint positionAttri = shaderProgram->getAttribLocation("position");
+	glVertexAttribPointer(
+		positionAttri,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0
+	);
+	glEnableVertexArrayAttrib(VAO, positionAttri);
+
+	// Normal Buffer
+	glBindBuffer(GL_ARRAY_BUFFER, NBO);
+	glBufferData(GL_ARRAY_BUFFER,
+		normals.size() * sizeof(vec3),
+		normals.data(),
+		GL_STATIC_DRAW);
+
+	// Normal Attributions
+	GLuint normalAttri = shaderProgram->getAttribLocation("normal");
+	glVertexAttribPointer(
+		normalAttri,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0
+	);
+	glEnableVertexArrayAttrib(VAO, normalAttri);
+
+	// Texture Coordinate Buffer
+	glBindBuffer(GL_ARRAY_BUFFER, TCBO);
+	glBufferData(GL_ARRAY_BUFFER,
+		texCoords.size() * sizeof(vec2),
+		texCoords.data(),
+		GL_STATIC_DRAW);
+
+	// Texture Coordinates Attributions
+	GLuint texCoordAttri = shaderProgram->getAttribLocation("texCoord");
+	glVertexAttribPointer(
+		texCoordAttri,
+		2,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0
+	);
+	glEnableVertexArrayAttrib(VAO, texCoordAttri);
+
+	// Element / Indicies Array
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(
+		GL_ELEMENT_ARRAY_BUFFER,
+		indicies.size() * sizeof(u32),
+		indicies.data(),
+		GL_STATIC_DRAW
+	);
+}
+
 void Renderer::addMaterial(Material* material)
 {
 	MaterialUniform rendMaterial = material->getMaterialUniform();
@@ -329,10 +441,24 @@ void Renderer::set_rendObj_rotation(u32 index, vec3 rotation)
 		glm::eulerAngleXYZ(rotation.y * 0.005f, rotation.x * 0.005f, rotation.z * 0.005f);
 }
 
-void Renderer::set_all_rendObj_rotation(vec3 rotation)
+void Renderer::set_rendMassPoint_rotation(u32 index, vec3 rotation)
+{
+	rendMassPoints[index].rotation =
+		glm::eulerAngleXYZ(rotation.y * 0.005f, rotation.x * 0.005f, rotation.z * 0.005f);
+}
+
+void Renderer::set_all_rendable_rotation(vec3 rotation)
 {
 	for (u32 i = 0; i < rendObjs.size(); i++)
 		set_rendObj_rotation(i, rotation);
+
+	for (u32 i = 0; i < rendMassPoints.size(); i++)
+		set_rendMassPoint_rotation(i, rotation);
+}
+
+void Renderer::set_rendMassPoint_position(u32 index, vec3 position)
+{
+	rendMassPoints[index].position = position;
 }
 
 Camera* Renderer::getCamera()

@@ -141,6 +141,13 @@ void GLShader::use()
 	glUseProgram(programId);
 }
 
+void GLShader::setUniformVec3(const char* name, const vec3& value)
+{
+	GLuint uniformId = glGetUniformLocation(this->programId, name);
+
+	glUniform3fv(uniformId, 1, glm::value_ptr(value));
+}
+
 void GLShader::setUniformMat4(const char* name, const mat4& value)
 {
 	GLuint uniformId = glGetUniformLocation(this->programId, name);

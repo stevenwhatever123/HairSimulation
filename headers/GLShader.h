@@ -21,6 +21,7 @@ public:
 
 	// Command funtions
 	void use();
+	void setUniformVec3(const char* name, const vec3& value);
 	void setUniformMat4(const char* name, const mat4& value);
 	void setUniformMaterial(GLuint uniformIndex, const MaterialUniform &rendMaterial);
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "Types.h"
 
+#include "MassPoint.h"
 #include "Mesh.h"
 
 class HairManager
@@ -9,17 +10,13 @@ private:
 
 public:
 
-	std::vector<vec3> hairRootPositions;
-	std::vector<vec3> hairRootNormals;
-	std::vector<vec2> hairRootTexCoords;
-	std::vector<u32> hairRootIndicies;
+	std::vector<MassPoint*> mass_points;
 
 public:
 	HairManager();
 	~HairManager();
 
-	void generateHairRoots(const Mesh* mesh);
+	void generateHairRootMassPoints(const Mesh* mesh);
 
-	Mesh* getHairRootAsMeshes();
+	std::vector<Mesh*> getHairRootMassPointsAsMeshes();
 };
-

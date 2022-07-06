@@ -2,10 +2,7 @@
 #include "Managers/HairManager.h"
 
 HairManager::HairManager():
-	hairRootPositions(),
-	hairRootNormals(),
-	hairRootTexCoords(),
-	hairRootIndicies()
+	mass_points()
 {
 
 }
@@ -15,14 +12,9 @@ HairManager::~HairManager()
 
 }
 
-void HairManager::generateHairRoots(const Mesh *mesh)
+void HairManager::generateHairRootMassPoints(const Mesh *mesh)
 {
-	int currentIndiciesSize = hairRootIndicies.size();
-
-	//if (mesh->positions.size() > 500)
-	//	return;
-
-	for (u32 i = 0; i < mesh->indicies.size() - 3; i+=3)
+	for (u32 i = 0; i < mesh->indicies.size() - 3; i += 3)
 	{
 		// Get the middle point of the face
 		vec3 v0 = mesh->positions[mesh->indicies[i + 0]];
@@ -43,36 +35,36 @@ void HairManager::generateHairRoots(const Mesh *mesh)
 
 		vec2 tc = (t0 + t1 + t2) / 3.0f;
 
-		hairRootPositions.push_back(v);
-		hairRootNormals.push_back(n);
-		hairRootTexCoords.push_back(tc);
-		//hairRootIndicies.push_back((i / 3.0f));
-		hairRootIndicies.push_back(currentIndiciesSize + (i / 3.0f));
+		MassPoint* mass_point = new MassPoint(v, n, tc, 1.0f, true);
+
+		mass_points.push_back(mass_point);
 	}
 
-	printf("Generated %i hair roots\n", hairRootPositions.size());
+	printf("Generated %i hair root mass points\n", mass_points.size());
 }
 
-Mesh* HairManager::getHairRootAsMeshes()
+std::vector<Mesh*> HairManager::getHairRootMassPointsAsMeshes()
 {
-	Mesh* mesh = new Mesh();
-	mesh->name = "HairRootMesh";
-	mesh->positions.resize(hairRootPositions.size());
-	mesh->normals.resize(hairRootNormals.size());
-	mesh->texCoords.resize(hairRootTexCoords.size());
-	mesh->indicies.resize(hairRootIndicies.size());
+	std::vector<Mesh*> mass_point_meshes;
+	mass_point_meshes.resize(mass_points.size());
 
-	for (u32 i = 0; i < hairRootPositions.size(); i++)
+	for (u32 i = 0; i < mass_points.size(); i++)
 	{
-		mesh->positions[i] = hairRootPositions[i];
-		mesh->normals[i] = hairRootNormals[i];
-		mesh->texCoords[i] = hairRootTexCoords[i];
-		mesh->indicies[i] = hairRootIndicies[i];
+		mass_point_meshes[i] = new Mesh();
+
+		mass_point_meshes[i]->name = "MassPointRoot";
+
+		mass_point_meshes[i]->positions.push_back(mass_points[i]->getPosition());
+		mass_point_meshes[i]->normals.push_back(mass_points[i]->getNormal());
+		mass_point_meshes[i]->texCoords.push_back(mass_points[i]->getTexCoord());
+		// Because there is only one point
+		mass_point_meshes[i]->indicies.push_back(0);
+
+		mass_point_meshes[i]->isMesh = false;
+		mass_point_meshes[i]->isMassPoint = true;
+		mass_point_meshes[i]->primitive_type = GL_POINTS;
+		mass_point_meshes[i]->mass_point_id = i;
 	}
 
-	mesh->isHairRoot = true;
-	mesh->isMesh = false;
-	mesh->primitive_type = GL_POINTS;
-
-	return mesh;
+	return mass_point_meshes;
 }

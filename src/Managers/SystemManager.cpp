@@ -215,7 +215,7 @@ void SystemManager::update_renderer()
 
     renderer->setFramebufferSize(width, height);
 
-    renderer->set_all_rendObj_rotation(modelRotation);
+    renderer->set_all_rendable_rotation(modelRotation);
 
     renderer->draw();
 }
@@ -244,27 +244,27 @@ void SystemManager::loadModel()
 
         Model* modelScene = SystemUtils::readModel(modelFilename.c_str());
 
-        if (materialReadSuccess)
-            printf("Material Read Successfully!\n");
-        else
-            printf("Error: Cannot find: %s\n", materialFilename.c_str());
-
         //printModelDetails(*modelScene);
 
         for (Mesh* mesh : modelScene->meshes)
         {
             if (mesh->isSkull)
             {
-                hairManager->generateHairRoots(mesh);
+                hairManager->generateHairRootMassPoints(mesh);
             }
         }
 
-        Mesh* hairRootMesh = hairManager->getHairRootAsMeshes();
+        std::vector<Mesh*> hairRootMesh = hairManager->getHairRootMassPointsAsMeshes();
 
-        renderer->addObject(hairRootMesh);
+        for (Mesh* mass_point_mesh : hairRootMesh)
+        {
+            renderer->addMassPoint(mass_point_mesh);
 
-        // Clear data
-        delete hairRootMesh;
+            // Clear hair root mesh data
+            delete mass_point_mesh;
+        }       
+        hairRootMesh.clear();
+
 
         renderer->addMeshScene(modelScene);
 
