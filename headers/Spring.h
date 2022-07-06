@@ -26,4 +26,8 @@ public:
 	Spring(MassPoint* p1, MassPoint* p2, float ks, float restLength, float kd);
 
 	~Spring();
+
+	// Getters
+	MassPoint* getMassPointOne();
+	MassPoint* getMassPointTwo();
 };

@@ -17,6 +17,6 @@ void main()
 
 	gl_PointSize = 5.0f;
 
-	//gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1);
-	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(u_position, 1);
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1);
+	//gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(u_position, 1);
 }

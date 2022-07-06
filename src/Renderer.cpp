@@ -105,6 +105,7 @@ void Renderer::draw()
 
 			shaderProgram->setUniformMat4("viewMatrix", camera->getTransformation());
 			shaderProgram->setUniformMat4("projectionMatrix", projectionMatrix);
+
 			shaderProgram->setUniformMat4("modelMatrix", renderObject.getTransformation());
 
 			shaderProgram->setUniformMaterial(UBO, rendMaterials[renderObject.material_index]);
@@ -128,7 +129,7 @@ void Renderer::draw()
 
 		shaderProgram->use();
 
-		shaderProgram->setUniformVec3("u_position", renderMassPoint.position);
+		//shaderProgram->setUniformVec3("u_position", renderMassPoint.position);
 
 		shaderProgram->setUniformMat4("viewMatrix", camera->getTransformation());
 		shaderProgram->setUniformMat4("projectionMatrix", projectionMatrix);

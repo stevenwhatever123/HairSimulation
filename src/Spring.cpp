@@ -25,3 +25,13 @@ Spring::~Spring()
 {
 
 }
+
+MassPoint* Spring::getMassPointOne()
+{
+	return p1;
+}
+
+MassPoint* Spring::getMassPointTwo()
+{
+	return p2;
+}
