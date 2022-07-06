@@ -254,6 +254,8 @@ void SystemManager::loadModel()
             }
         }
 
+        hairManager->generateHairStrandMassPoints();
+
         std::vector<Mesh*> hairRootMesh = hairManager->getHairRootMassPointsAsMeshes();
 
         for (Mesh* mass_point_mesh : hairRootMesh)

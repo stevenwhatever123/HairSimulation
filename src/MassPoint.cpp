@@ -8,7 +8,8 @@ MassPoint::MassPoint():
 	velocity(0),
 	force(0),
 	mass(0),
-	isHairRoot(false)
+	isHairRoot(false),
+	primitive(0)
 {
 
 }
@@ -20,7 +21,8 @@ MassPoint::MassPoint(vec3 position, float mass) :
 	velocity(0),
 	force(0),
 	mass(mass),
-	isHairRoot(false)
+	isHairRoot(false),
+	primitive(0)
 {
 
 }
@@ -32,7 +34,8 @@ MassPoint::MassPoint(vec3 position, vec3 normal, vec2 texCoord, float mass, bool
 	velocity(0),
 	force(0),
 	mass(mass),
-	isHairRoot(isHairRoot)
+	isHairRoot(isHairRoot),
+	primitive(0)
 {
 
 }

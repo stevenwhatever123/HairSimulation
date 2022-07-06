@@ -43,6 +43,33 @@ void HairManager::generateHairRootMassPoints(const Mesh *mesh)
 	printf("Generated %i hair root mass points\n", mass_points.size());
 }
 
+void HairManager::generateHairStrandMassPoints()
+{
+	u32 currentMassPointSize = mass_points.size();
+
+	// distance between two mass point
+	f32 t = 0.1f;
+
+	for (u32 i = 0; i < currentMassPointSize; i++)
+	{
+		vec3 old_position = mass_points[i]->getPosition();
+
+		vec3 direction = mass_points[i]->getNormal();
+
+		vec3 new_position = old_position + t * direction;
+
+		vec2 texCoord = mass_points[i]->getTexCoord();
+
+		MassPoint* new_mass_point = new MassPoint(new_position, direction, texCoord, 1.0f, false);
+
+		// Link two mass point
+		Spring* spring = new Spring(mass_points[i], new_mass_point, 0, 0, 0);
+
+		mass_points.push_back(new_mass_point);
+		springs.push_back(spring);
+	}
+}
+
 std::vector<Mesh*> HairManager::getHairRootMassPointsAsMeshes()
 {
 	std::vector<Mesh*> mass_point_meshes;
@@ -52,7 +79,7 @@ std::vector<Mesh*> HairManager::getHairRootMassPointsAsMeshes()
 	{
 		mass_point_meshes[i] = new Mesh();
 
-		mass_point_meshes[i]->name = "MassPointRoot";
+		mass_point_meshes[i]->name = "MassPointRoot" + i;
 
 		mass_point_meshes[i]->positions.push_back(mass_points[i]->getPosition());
 		mass_point_meshes[i]->normals.push_back(mass_points[i]->getNormal());
@@ -67,4 +94,23 @@ std::vector<Mesh*> HairManager::getHairRootMassPointsAsMeshes()
 	}
 
 	return mass_point_meshes;
+}
+
+std::vector<Mesh*> HairManager::getHairStrandSpringsAsMeshes()
+{
+	std::vector<Mesh*> hair_springs_meshes;
+	hair_springs_meshes.resize(springs.size());
+
+	for (u32 i = 0; i < springs.size(); i++)
+	{
+		hair_springs_meshes[i] = new Mesh();
+
+		hair_springs_meshes[i]->name = "MassPointSpring" + i;
+
+
+		hair_springs_meshes[i]->positions.resize(2);
+		//hair_springs_meshes[i]->positions.push_back
+	}
+
+	return hair_springs_meshes;
 }

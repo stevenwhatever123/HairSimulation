@@ -11,5 +11,7 @@ public:
 public:
 	Model();
 	~Model();
+
+	vec3 getCenterPosition();
 };
 
