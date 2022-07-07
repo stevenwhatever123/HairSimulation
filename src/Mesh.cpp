@@ -38,6 +38,8 @@ void Mesh::generateBuffers(GLShader* program, u32 shaderIndex)
 
 	glGenVertexArrays(1, &VAO);
 
+	glBindVertexArray(VAO);
+
 	// Position Buffer
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER,

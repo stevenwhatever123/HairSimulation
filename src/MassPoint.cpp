@@ -47,7 +47,7 @@ MassPoint::~MassPoint()
 
 void MassPoint::moveDown()
 {
-	position.y -= 0.0001f;
+	position.y -= 0.01f;
 }
 
 vec3 MassPoint::getPosition() const
