@@ -99,7 +99,6 @@ void Renderer::draw()
 			0,
 			(void*)0
 		);
-		glEnableVertexArrayAttrib(rendObj.VAO, posAttri);
 
 		glBindBuffer(GL_ARRAY_BUFFER, rendObj.NBO);
 		GLuint normalAttri = shaderProgram->getAttribLocation("normal");
@@ -111,7 +110,6 @@ void Renderer::draw()
 			0,
 			(void*)0
 		);
-		glEnableVertexArrayAttrib(rendObj.VAO, normalAttri);
 
 		glBindBuffer(GL_ARRAY_BUFFER, rendObj.TCBO);
 		GLuint texCoordAttri = shaderProgram->getAttribLocation("texCoord");

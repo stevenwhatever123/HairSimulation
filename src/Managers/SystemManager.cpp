@@ -261,12 +261,7 @@ void SystemManager::loadModel()
         hairStrandMesh->generateBuffers(currentProgram, 1);
         renderer->addMesh(hairStrandMesh);
 
-
         renderer->addMeshScene(modelScene);
-        for (Mesh* mesh : modelScene->meshes)
-        {
-            mesh->clear_cpu_memory();
-        }
 
         // Clear mesh data from cpu
         for (Mesh* mesh : modelScene->meshes)

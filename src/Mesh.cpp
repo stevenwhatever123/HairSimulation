@@ -107,6 +107,11 @@ void Mesh::generateBuffers(GLShader* program, u32 shaderIndex)
 	);
 }
 
+void Mesh::updateBuffers()
+{
+
+}
+
 void Mesh::clear_cpu_memory()
 {
 	positions.clear();

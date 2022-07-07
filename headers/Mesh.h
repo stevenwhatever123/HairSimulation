@@ -39,6 +39,7 @@ public:
 
 
 	void generateBuffers(GLShader* program, u32 shaderIndex);
+	void updateBuffers();
 
 	void clear_cpu_memory();
 };
