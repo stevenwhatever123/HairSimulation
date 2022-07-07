@@ -25,5 +25,8 @@ public:
 	void generateHairStrandMassPoints();
 
 	std::vector<Mesh*> getHairRootMassPointsAsMeshes();
-	std::vector<Mesh*> getHairStrandSpringsAsMeshes();
+
+	Mesh* getHairStrandSpringsAsMeshes();
+	void generateHairStrandSpringsBuffers(Mesh* mesh);
+	void updateHairStrandSpringMesh(Mesh* mesh);
 };

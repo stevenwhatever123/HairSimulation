@@ -6,20 +6,11 @@ Renderer::Renderer(int width, int height, Camera* camera) :
 	width(width),
 	height(height),
 	camera(camera),
-	VBO(-1),
-	NBO(-1),
-	TCBO(-1),
-	EBO(-1),
 	UBO(-1),
-	VAO(-1),
 	shaderPrograms(),
 	projectionMatrix(1),
 	clear_color(0),
-	positions(),
-	normals(),
-	texCoords(),
-	indicies(),
-	rendObjs(),
+	rendObjects(),
 	mass_point_count(0)
 {
 	init();
@@ -92,64 +83,74 @@ void Renderer::draw()
 
 	GLShader* shaderProgram;
 
-	glBindVertexArray(VAO);
-
-	for (RendObj &renderObject : rendObjs)
+	for (RendObj &rendObj : rendObjects)
 	{
-		if (renderObject.isMesh)
-		{
-			glDisable(GL_PROGRAM_POINT_SIZE);
-			shaderProgram = shaderPrograms[0];
+		shaderProgram = shaderPrograms[rendObj.shaderIndex];
 
-			shaderProgram->use();
+		glBindVertexArray(rendObj.VAO);
 
-			shaderProgram->setUniformMat4("viewMatrix", camera->getTransformation());
-			shaderProgram->setUniformMat4("projectionMatrix", projectionMatrix);
+		glBindBuffer(GL_ARRAY_BUFFER, rendObj.VBO);
+		GLuint posAttri = shaderProgram->getAttribLocation("position");
+		glVertexAttribPointer(
+			posAttri,
+			3,
+			GL_FLOAT,
+			GL_FALSE,
+			0,
+			(void*)0
+		);
+		glEnableVertexArrayAttrib(rendObj.VAO, posAttri);
 
-			shaderProgram->setUniformMat4("modelMatrix", renderObject.getTransformation());
+		glBindBuffer(GL_ARRAY_BUFFER, rendObj.NBO);
+		GLuint normalAttri = shaderProgram->getAttribLocation("normal");
+		glVertexAttribPointer(
+			normalAttri,
+			3,
+			GL_FLOAT,
+			GL_FALSE,
+			0,
+			(void*)0
+		);
+		glEnableVertexArrayAttrib(rendObj.VAO, normalAttri);
 
-			shaderProgram->setUniformMaterial(UBO, rendMaterials[renderObject.material_index]);
+		glBindBuffer(GL_ARRAY_BUFFER, rendObj.TCBO);
+		GLuint texCoordAttri = shaderProgram->getAttribLocation("texCoord");
+		glVertexAttribPointer(
+			texCoordAttri,
+			2,
+			GL_FLOAT,
+			GL_FALSE,
+			0,
+			(void*)0
+		);
 
-			glBindTexture(GL_TEXTURE_2D, materials[renderObject.material_index].texture_id);
-
-			glDrawElements(
-				renderObject.primitive,
-				renderObject.endIndex - renderObject.startIndex,
-				GL_UNSIGNED_INT,
-				(void*)(renderObject.startIndex * sizeof(u32)));
-
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-	}
-
-	for (RendMassPoint& renderMassPoint : rendMassPoints)
-	{
-		glEnable(GL_PROGRAM_POINT_SIZE);
-		shaderProgram = shaderPrograms[1];
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rendObj.EBO);
 
 		shaderProgram->use();
 
-		//shaderProgram->setUniformVec3("u_position", renderMassPoint.position);
-
 		shaderProgram->setUniformMat4("viewMatrix", camera->getTransformation());
 		shaderProgram->setUniformMat4("projectionMatrix", projectionMatrix);
-		shaderProgram->setUniformMat4("modelMatrix", renderMassPoint.getTransformation());
+		shaderProgram->setUniformMat4("modelMatrix", rendObj.getTransformation());
+
+		if (rendObj.materialIndex > 0)
+		{
+			shaderProgram->setUniformMaterial(UBO, rendMaterials[rendObj.materialIndex]);
+
+			glBindTexture(GL_TEXTURE_2D, materials[rendObj.materialIndex].texture_id);
+		}
 
 		glDrawElements(
-			renderMassPoint.primitive,
-			renderMassPoint.endIndex - renderMassPoint.startIndex,
+			rendObj.primitive,
+			rendObj.elementSize,
 			GL_UNSIGNED_INT,
-			(void*)(renderMassPoint.startIndex * sizeof(u32)));
+			(void*) 0
+		);
 	}
 }
 
 void Renderer::genGLBuffers()
 {
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &NBO);
-	glGenBuffers(1, &TCBO);
-	glGenBuffers(1, &EBO);
-
+	// Uniform buffer
 	glGenBuffers(1, &UBO);
 
 	// Allocate memory for uniform buffer
@@ -158,220 +159,29 @@ void Renderer::genGLBuffers()
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	glBindBufferRange(GL_UNIFORM_BUFFER, 0, UBO, 0, sizeof(MaterialUniform));
-
-	glGenVertexArrays(1, &VAO);
 }
 
-void Renderer::addObject(Mesh* mesh)
+void Renderer::addMesh(Mesh* mesh)
 {
-	RendObj renderObject{};
-	renderObject.translation = mat4(1);
-	renderObject.rotation = mat4(1);
-	renderObject.scaling = mat4(1);
-	renderObject.startIndex = indicies.size();
-	renderObject.primitive = mesh->primitive_type;
-	renderObject.isMesh = mesh->isMesh;
-	renderObject.isMassPoint = mesh->isMassPoint;
+	RendObj rendObj{};
+	rendObj.translation = mat4(1);
+	rendObj.rotation = mat4(1);
+	rendObj.scaling = mat4(1);
 
-	const u32 currentMaterialSize = rendMaterials.size();
-	renderObject.material_index = currentMaterialSize + mesh->material_index;
+	rendObj.shaderIndex = mesh->shaderIndex;
+	rendObj.primitive = mesh->primitive_type;
+	rendObj.elementSize = mesh->indicies.size();
+	rendObj.VBO = mesh->VBO;
+	rendObj.NBO = mesh->NBO;
+	rendObj.TCBO = mesh->TCBO;
+	rendObj.EBO = mesh->EBO;
+	rendObj.VAO = mesh->VAO;
 
-	const u32 currentVerticesSize = positions.size();
+	u32 currentMaterialSize = materials.size();
 
-	// Copy vertex position from mesh to the renderer
-	copy(mesh->positions.begin(), mesh->positions.end(), std::back_inserter(positions));
-	// Copy vertex normal from mesh to the renderer
-	copy(mesh->normals.begin(), mesh->normals.end(), std::back_inserter(normals));
-	// Copy texture coordinates from mesh to the renderer
-	copy(mesh->texCoords.begin(), mesh->texCoords.end(), std::back_inserter(texCoords));
+	rendObj.materialIndex = currentMaterialSize + mesh->material_index;
 
-	// Copy indicies
-	for (u32 i = 0; i < mesh->indicies.size(); i++)
-	{
-		indicies.push_back(currentVerticesSize + mesh->indicies[i]);
-	}
-
-	renderObject.endIndex = indicies.size();
-
-	rendObjs.push_back(renderObject);
-
-	// Position Buffer
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER,
-		positions.size() * sizeof(vec3),
-		positions.data(),
-		GL_STATIC_DRAW);
-
-	GLShader* shaderProgram = shaderPrograms[0];
-
-	// Positions Attributions
-	GLuint positionAttri = shaderProgram->getAttribLocation("position");
-	glVertexAttribPointer(
-		positionAttri,
-		3,
-		GL_FLOAT,
-		GL_FALSE,
-		0,
-		(void*)0
-	);
-	glEnableVertexArrayAttrib(VAO, positionAttri);
-
-	// Normal Buffer
-	glBindBuffer(GL_ARRAY_BUFFER, NBO);
-	glBufferData(GL_ARRAY_BUFFER,
-		normals.size() * sizeof(vec3),
-		normals.data(),
-		GL_STATIC_DRAW);
-
-	// Normal Attributions
-	GLuint normalAttri = shaderProgram->getAttribLocation("normal");
-	glVertexAttribPointer(
-		normalAttri,
-		3,
-		GL_FLOAT,
-		GL_FALSE,
-		0,
-		(void*)0
-	);
-	glEnableVertexArrayAttrib(VAO, normalAttri);
-
-	// Texture Coordinate Buffer
-	glBindBuffer(GL_ARRAY_BUFFER, TCBO);
-	glBufferData(GL_ARRAY_BUFFER,
-		texCoords.size() * sizeof(vec2),
-		texCoords.data(),
-		GL_STATIC_DRAW);
-
-	// Texture Coordinates Attributions
-	GLuint texCoordAttri = shaderProgram->getAttribLocation("texCoord");
-	glVertexAttribPointer(
-		texCoordAttri,
-		2,
-		GL_FLOAT,
-		GL_FALSE,
-		0,
-		(void*)0
-	);
-	glEnableVertexArrayAttrib(VAO, texCoordAttri);
-	
-	// Element / Indicies Array
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(
-		GL_ELEMENT_ARRAY_BUFFER,
-		indicies.size() * sizeof(u32),
-		indicies.data(),
-		GL_STATIC_DRAW
-	);
-}
-
-void Renderer::addMassPoint(Mesh* mesh)
-{
-	RendMassPoint renderObject{};
-	renderObject.translation = mat4(1);
-	renderObject.rotation = mat4(1);
-	renderObject.scaling = mat4(1);
-	renderObject.startIndex = indicies.size();
-	renderObject.primitive = mesh->primitive_type;
-	renderObject.isMesh = mesh->isMesh;
-	renderObject.isMassPoint = mesh->isMassPoint;
-	// Mass point has only one position
-	renderObject.position = mesh->positions[0];
-
-	if (renderObject.isMassPoint)
-	{
-		renderObject.mass_point_id = mass_point_count;
-		mass_point_count++;
-	}
-
-	const u32 currentMaterialSize = rendMaterials.size();
-	renderObject.material_index = currentMaterialSize + mesh->material_index;
-
-	const u32 currentVerticesSize = positions.size();
-
-	// Copy vertex position from mesh to the renderer
-	copy(mesh->positions.begin(), mesh->positions.end(), std::back_inserter(positions));
-	// Copy vertex normal from mesh to the renderer
-	copy(mesh->normals.begin(), mesh->normals.end(), std::back_inserter(normals));
-	// Copy texture coordinates from mesh to the renderer
-	copy(mesh->texCoords.begin(), mesh->texCoords.end(), std::back_inserter(texCoords));
-
-	// Copy indicies
-	for (u32 i = 0; i < mesh->indicies.size(); i++)
-	{
-		indicies.push_back(currentVerticesSize + mesh->indicies[i]);
-	}
-
-	renderObject.endIndex = indicies.size();
-
-	rendMassPoints.push_back(renderObject);
-
-	// Position Buffer
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER,
-		positions.size() * sizeof(vec3),
-		positions.data(),
-		GL_STATIC_DRAW);
-
-	GLShader* shaderProgram = shaderPrograms[0];
-
-	// Positions Attributions
-	GLuint positionAttri = shaderProgram->getAttribLocation("position");
-	glVertexAttribPointer(
-		positionAttri,
-		3,
-		GL_FLOAT,
-		GL_FALSE,
-		0,
-		(void*)0
-	);
-	glEnableVertexArrayAttrib(VAO, positionAttri);
-
-	// Normal Buffer
-	glBindBuffer(GL_ARRAY_BUFFER, NBO);
-	glBufferData(GL_ARRAY_BUFFER,
-		normals.size() * sizeof(vec3),
-		normals.data(),
-		GL_STATIC_DRAW);
-
-	// Normal Attributions
-	GLuint normalAttri = shaderProgram->getAttribLocation("normal");
-	glVertexAttribPointer(
-		normalAttri,
-		3,
-		GL_FLOAT,
-		GL_FALSE,
-		0,
-		(void*)0
-	);
-	glEnableVertexArrayAttrib(VAO, normalAttri);
-
-	// Texture Coordinate Buffer
-	glBindBuffer(GL_ARRAY_BUFFER, TCBO);
-	glBufferData(GL_ARRAY_BUFFER,
-		texCoords.size() * sizeof(vec2),
-		texCoords.data(),
-		GL_STATIC_DRAW);
-
-	// Texture Coordinates Attributions
-	GLuint texCoordAttri = shaderProgram->getAttribLocation("texCoord");
-	glVertexAttribPointer(
-		texCoordAttri,
-		2,
-		GL_FLOAT,
-		GL_FALSE,
-		0,
-		(void*)0
-	);
-	glEnableVertexArrayAttrib(VAO, texCoordAttri);
-
-	// Element / Indicies Array
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(
-		GL_ELEMENT_ARRAY_BUFFER,
-		indicies.size() * sizeof(u32),
-		indicies.data(),
-		GL_STATIC_DRAW
-	);
+	rendObjects.push_back(rendObj);
 }
 
 void Renderer::addMaterial(Material* material)
@@ -405,19 +215,14 @@ void Renderer::addMeshScene(Model* meshScene)
 {
 	for (Mesh* mesh : meshScene->meshes)
 	{
-		addObject(mesh);
+		mesh->generateBuffers(shaderPrograms[0], 0);
+		addMesh(mesh);
 	}
 
 	for (Material* material : meshScene->materials)
 	{
 		addMaterial(material);
 	}
-
-	// Clear mesh data from cpu
-	positions.clear();
-	normals.clear();
-	texCoords.clear();
-	indicies.clear();
 }
 
 void Renderer::set_clear_color(vec4 color)
@@ -437,28 +242,23 @@ void Renderer::set_clear_color(vec4 color)
 
 void Renderer::set_rendObj_rotation(u32 index, vec3 rotation)
 {
-	rendObjs[index].rotation =
+	rendObjects[index].rotation =
 		glm::eulerAngleXYZ(rotation.y * 0.005f, rotation.x * 0.005f, rotation.z * 0.005f);
 }
 
 void Renderer::set_rendMassPoint_rotation(u32 index, vec3 rotation)
 {
-	rendMassPoints[index].rotation =
+	rendObjects[index].rotation =
 		glm::eulerAngleXYZ(rotation.y * 0.005f, rotation.x * 0.005f, rotation.z * 0.005f);
 }
 
 void Renderer::set_all_rendable_rotation(vec3 rotation)
 {
-	for (u32 i = 0; i < rendObjs.size(); i++)
+	for (u32 i = 0; i < rendObjects.size(); i++)
 		set_rendObj_rotation(i, rotation);
 
-	for (u32 i = 0; i < rendMassPoints.size(); i++)
+	for (u32 i = 0; i < rendObjects.size(); i++)
 		set_rendMassPoint_rotation(i, rotation);
-}
-
-void Renderer::set_rendMassPoint_position(u32 index, vec3 position)
-{
-	rendMassPoints[index].position = position;
 }
 
 Camera* Renderer::getCamera()

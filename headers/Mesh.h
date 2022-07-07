@@ -1,6 +1,8 @@
 #pragma once
 #include "Types.h"
 
+#include "GLShader.h"
+
 class Mesh
 {
 public:
@@ -22,9 +24,21 @@ public:
 
 	u32 material_index;
 
+	u32 shaderIndex;
+	GLuint VBO;							// Vertex Buffer Object
+	GLuint NBO;							// Normal Buffer Object
+	GLuint TCBO;						// Texture Coordinate Buffer Object
+	GLuint EBO;							// Element Array Buffer Object
+
+	GLuint VAO;
+
 public:
 
 	Mesh();
 	~Mesh();
 
+
+	void generateBuffers(GLShader* program, u32 shaderIndex);
+
+	void clear_cpu_memory();
 };

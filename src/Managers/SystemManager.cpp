@@ -256,31 +256,17 @@ void SystemManager::loadModel()
 
         hairManager->generateHairStrandMassPoints();
 
-
-        // Hair root rendering
-        //std::vector<Mesh*> hairRootMesh = hairManager->getHairRootMassPointsAsMeshes();
-        //for (Mesh* mass_point_mesh : hairRootMesh)
-        //{
-        //    renderer->addMassPoint(mass_point_mesh);
-
-        //    // Clear hair root mesh data
-        //    delete mass_point_mesh;
-        //}       
-        //hairRootMesh.clear();
-
         // Hair Strand rendering
-        std::vector<Mesh*> hairStrandMesh = hairManager->getHairStrandSpringsAsMeshes();
-        for (Mesh* hair_strand_mesh : hairStrandMesh)
-        {
-            renderer->addMassPoint(hair_strand_mesh);
-
-            // Clear hair strand mesh data
-            delete hair_strand_mesh;
-        }
-        hairStrandMesh.clear();
+        Mesh* hairStrandMesh = hairManager->getHairStrandSpringsAsMeshes();
+        hairStrandMesh->generateBuffers(currentProgram, 1);
+        renderer->addMesh(hairStrandMesh);
 
 
         renderer->addMeshScene(modelScene);
+        for (Mesh* mesh : modelScene->meshes)
+        {
+            mesh->clear_cpu_memory();
+        }
 
         // Clear mesh data from cpu
         for (Mesh* mesh : modelScene->meshes)
