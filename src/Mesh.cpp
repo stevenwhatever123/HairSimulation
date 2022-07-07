@@ -109,7 +109,19 @@ void Mesh::generateBuffers(GLShader* program, u32 shaderIndex)
 
 void Mesh::updateBuffers()
 {
+	// Position Buffer
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER,
+		positions.size() * sizeof(vec3),
+		positions.data(),
+		GL_STATIC_DRAW);
 
+	// Normal Buffer
+	glBindBuffer(GL_ARRAY_BUFFER, NBO);
+	glBufferData(GL_ARRAY_BUFFER,
+		normals.size() * sizeof(vec3),
+		normals.data(),
+		GL_STATIC_DRAW);
 }
 
 void Mesh::clear_cpu_memory()

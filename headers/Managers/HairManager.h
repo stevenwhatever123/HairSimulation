@@ -11,6 +11,8 @@ private:
 
 	u32 numMassPointPerStrand = 1;
 
+	Mesh* hair_springs_meshes;
+
 public:
 
 	std::vector<MassPoint*> mass_points;
@@ -24,9 +26,6 @@ public:
 
 	void generateHairStrandMassPoints();
 
-	std::vector<Mesh*> getHairRootMassPointsAsMeshes();
-
 	Mesh* getHairStrandSpringsAsMeshes();
-	void generateHairStrandSpringsBuffers(Mesh* mesh);
-	void updateHairStrandSpringMesh(Mesh* mesh);
+	void updateHairStrandSpringMesh();
 };

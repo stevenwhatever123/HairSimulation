@@ -183,7 +183,10 @@ void SystemManager::update()
         glfwTerminate();
     }
 
+    update_hair_manager();
+
     update_camera();
+
     update_renderer();
 
     glfwSwapBuffers(window);
@@ -207,6 +210,11 @@ void SystemManager::update_inputs()
 void SystemManager::update_camera()
 {
     renderer->getCamera()->updateTransformation();
+}
+
+void SystemManager::update_hair_manager()
+{
+    hairManager->updateHairStrandSpringMesh();
 }
 
 void SystemManager::update_renderer()

@@ -44,6 +44,7 @@ public:
 	void update();
 	void update_inputs();
 	void update_camera();
+	void update_hair_manager();
 	void update_renderer();
 
 	// Utils
