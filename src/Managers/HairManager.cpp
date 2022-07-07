@@ -13,6 +13,17 @@ HairManager::~HairManager()
 
 }
 
+void HairManager::update(float dt)
+{
+	for (MassPoint* mp : mass_points)
+	{
+		if (mp->isHairRoot())
+			continue;
+
+		mp->moveDown();
+	}
+}
+
 void HairManager::generateHairRootMassPoints(const Mesh *mesh)
 {
 	for (u32 i = 0; i < mesh->indicies.size() - 3; i += 3)

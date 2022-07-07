@@ -22,6 +22,8 @@ public:
 	HairManager();
 	~HairManager();
 
+	void update(float dt);
+
 	void generateHairRootMassPoints(const Mesh* mesh);
 
 	void generateHairStrandMassPoints();

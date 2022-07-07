@@ -16,7 +16,7 @@ private:
 
 	float mass;
 
-	bool isHairRoot;
+	bool hairRoot;
 
 	u32 primitive;
 
@@ -30,9 +30,12 @@ public:
 
 	~MassPoint();
 
+	void moveDown();
+
 	// Getters
 	vec3 getPosition() const;
 	vec3 getNormal() const;
 	vec2 getTexCoord() const;
+	bool isHairRoot() const;
 };
 
