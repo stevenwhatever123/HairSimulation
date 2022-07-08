@@ -14,6 +14,8 @@ private:
 	vec3 velocity;
 	vec3 force;
 
+	vec3 springForce;
+
 	float mass;
 
 	bool hairRoot;
@@ -32,10 +34,20 @@ public:
 
 	void moveDown();
 
+	void update(float dt);
+
+	// Command call
+	void resetSpringForce();
+
+	// Setters
+	void addSpringForce(vec3 force);
+
 	// Getters
 	vec3 getPosition() const;
 	vec3 getNormal() const;
 	vec2 getTexCoord() const;
 	bool isHairRoot() const;
+	f32 getMass() const;
+	vec3 getVelocity() const;
 };
 

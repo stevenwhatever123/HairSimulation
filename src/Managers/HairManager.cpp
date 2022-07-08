@@ -15,12 +15,37 @@ HairManager::~HairManager()
 
 void HairManager::update(float dt)
 {
+	for (Spring* spring : springs)
+	{
+		spring->getMassPointOne()->resetSpringForce();
+		spring->getMassPointTwo()->resetSpringForce();
+	}
+
+	for (Spring* spring : springs)
+	{
+		spring->update(dt);
+	}
+
+	for (Spring* spring : springs)
+	{
+		spring->getMassPointOne()->addSpringForce(spring->getP1TotalForce());
+		spring->getMassPointTwo()->addSpringForce(spring->getP2TotalForce());
+	}
+
 	for (MassPoint* mp : mass_points)
 	{
 		if (mp->isHairRoot())
 			continue;
 
-		mp->moveDown();
+		mp->update(dt);
+	}
+
+	if (springs.size() > 0)
+	{
+		MassPoint* mp1 = springs[0]->getMassPointOne();
+		MassPoint* mp2 = springs[0]->getMassPointTwo();
+
+		std::cout << "Distance: " << glm::distance(mp1->getPosition(), mp2->getPosition()) << "\n";
 	}
 }
 
@@ -47,7 +72,7 @@ void HairManager::generateHairRootMassPoints(const Mesh *mesh)
 
 		vec2 tc = (t0 + t1 + t2) / 3.0f;
 
-		MassPoint* mass_point = new MassPoint(v, n, tc, 1.0f, true);
+		MassPoint* mass_point = new MassPoint(v, n, tc, 0.1f, true);
 
 		mass_points.push_back(mass_point);
 	}
@@ -60,8 +85,8 @@ void HairManager::generateHairStrandMassPoints()
 	u32 currentMassPointSize = mass_points.size();
 
 	// distance between two mass point
-	//f32 t = 0.1f;
-	f32 t = 0.5f;
+	//f32 t = 0.001f;
+	f32 t = 0.1f;
 
 	for (u32 i = 0; i < currentMassPointSize; i++)
 	{
@@ -73,10 +98,17 @@ void HairManager::generateHairStrandMassPoints()
 
 		vec2 texCoord = mass_points[i]->getTexCoord();
 
-		MassPoint* new_mass_point = new MassPoint(new_position, direction, texCoord, 1.0f, false);
+		f32 old_mass = mass_points[i]->getMass();
+
+		MassPoint* new_mass_point = new MassPoint(new_position, direction, texCoord, old_mass, false);
 
 		// Link two mass point
-		Spring* spring = new Spring(mass_points[i], new_mass_point, 0, 0, 0);
+		//Spring* spring = new Spring(mass_points[i], new_mass_point, 0, t, 0);
+		
+		// This one looks good but not great enough
+		//Spring* spring = new Spring(mass_points[i], new_mass_point, 1000.0f, 2.0f);
+
+		Spring* spring = new Spring(mass_points[i], new_mass_point, 10.0f, 0.03f);
 
 		mass_points.push_back(new_mass_point);
 		springs.push_back(spring);

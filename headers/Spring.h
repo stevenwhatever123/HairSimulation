@@ -19,15 +19,39 @@ private:
 	// Damping factor
 	float kd;
 
+	float springForce;
+	float dampForce;
+	float totalForce;
+
+	vec3 p1SpringForce;
+	vec3 p2SpringForce;
+
+	vec3 p1DampForce;
+	vec3 p2DampForce;
+
+	vec3 p1TotalForce;
+	vec3 p2TotalForce;
+
+	f32 p1MoveForce;
+	f32 p2MoveForce;
+
 public:
 
 public:
 	Spring();
-	Spring(MassPoint* p1, MassPoint* p2, float ks, float restLength, float kd);
+	Spring(MassPoint* p1, MassPoint* p2, float ks, float kd);
 
 	~Spring();
+
+	void update(float dt);
 
 	// Getters
 	MassPoint* getMassPointOne();
 	MassPoint* getMassPointTwo();
+
+	vec3 getP1TotalForce() const;
+	vec3 getP2TotalForce() const;
+
+	f32 getP1MoveForce() const;
+	f32 getP2MoveForce() const;
 };

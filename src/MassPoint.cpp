@@ -7,6 +7,7 @@ MassPoint::MassPoint():
 	texCoord(0),
 	velocity(0),
 	force(0),
+	springForce(0),
 	mass(0),
 	hairRoot(false),
 	primitive(0)
@@ -19,6 +20,7 @@ MassPoint::MassPoint(vec3 position, float mass) :
 	normal(0),
 	texCoord(0),
 	velocity(0),
+	springForce(0),
 	force(0),
 	mass(mass),
 	hairRoot(false),
@@ -47,7 +49,33 @@ MassPoint::~MassPoint()
 
 void MassPoint::moveDown()
 {
-	position.y -= 0.01f;
+	position.y -= 0.0001f;
+}
+
+void MassPoint::update(float dt)
+{
+	// Reset force
+	force.x = 0;
+	force.y = 0;
+	force.z = 0;
+
+	vec3 gravity(0, -9.8f, 0);
+
+	force += gravity * mass + springForce;
+
+	velocity += (force * dt) / mass;
+
+	position += velocity * dt;
+}
+
+void MassPoint::resetSpringForce()
+{
+	this->springForce = vec3(0, 0, 0);
+}
+
+void MassPoint::addSpringForce(vec3 force)
+{
+	this->springForce += force;
 }
 
 vec3 MassPoint::getPosition() const
@@ -68,4 +96,14 @@ vec2 MassPoint::getTexCoord() const
 bool MassPoint::isHairRoot() const
 {
 	return this->hairRoot;
+}
+
+f32 MassPoint::getMass() const
+{
+	return this->mass;
+}
+
+vec3 MassPoint::getVelocity() const
+{
+	return this->velocity;
 }
