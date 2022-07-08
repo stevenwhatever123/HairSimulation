@@ -38,12 +38,12 @@ Spring::Spring(MassPoint* p1, MassPoint* p2, float ks, float kd):
 {
 	this->restLength = glm::distance(p2->getPosition(), p1->getPosition());
 
-	float differenceBetweenTwoLength = glm::distance(p2->getPosition(), p1->getPosition());
-	this->springForce = ks * differenceBetweenTwoLength;
+	//float differenceBetweenTwoLength = glm::distance(p2->getPosition(), p1->getPosition());
+	//this->springForce = ks * differenceBetweenTwoLength;
 
-	this->dampForce = glm::dot(glm::normalize(p2->getPosition() - p1->getPosition()), (p2->getVelocity() - p1->getVelocity())) * kd;
+	//this->dampForce = glm::dot(glm::normalize(p2->getPosition() - p1->getPosition()), (p2->getVelocity() - p1->getVelocity())) * kd;
 
-	this->totalForce = this->springForce = this->dampForce;
+	//this->totalForce = this->springForce = this->dampForce;
 
 }
 
@@ -68,12 +68,6 @@ void Spring::update(float dt)
 
 	p2TotalForce = p2SpringForce + p2DampForce;
 	p1TotalForce = -p2TotalForce;
-
-	//p2MoveForce = glm::dot(p2TotalForce, directionToP1);
-	//p1MoveForce = glm::dot(p1TotalForce, directionToP2);
-
-	//p2TotalForce = p2MoveForce * p2TotalForce;
-	//p1TotalForce = p1MoveForce * p1TotalForce;
 }
 
 MassPoint* Spring::getMassPointOne()

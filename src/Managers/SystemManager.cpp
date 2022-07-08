@@ -280,7 +280,7 @@ void SystemManager::loadModel()
             }
         }
 
-        hairManager->generateHairStrandMassPoints();
+        hairManager->generateHairStrandMassPoints(8);
 
         // Hair Strand rendering
         Mesh* hairStrandMesh = hairManager->getHairStrandSpringsAsMeshes();

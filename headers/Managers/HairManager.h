@@ -26,7 +26,7 @@ public:
 
 	void generateHairRootMassPoints(const Mesh* mesh);
 
-	void generateHairStrandMassPoints();
+	void generateHairStrandMassPoints(u32 mass_point_per_strand);
 
 	Mesh* getHairStrandSpringsAsMeshes();
 	void updateHairStrandSpringMesh();

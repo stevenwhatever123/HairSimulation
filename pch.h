@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <algorithm>
 #include <iterator>
+#include <thread>
 
 // Windows
 #include <Windows.h>
