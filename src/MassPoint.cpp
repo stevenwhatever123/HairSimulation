@@ -10,6 +10,7 @@ MassPoint::MassPoint():
 	springForce(0),
 	mass(0),
 	hairRoot(false),
+	foreHead(false),
 	primitive(0)
 {
 
@@ -24,12 +25,13 @@ MassPoint::MassPoint(vec3 position, float mass) :
 	force(0),
 	mass(mass),
 	hairRoot(false),
+	foreHead(false),
 	primitive(0)
 {
 
 }
 
-MassPoint::MassPoint(vec3 position, vec3 normal, vec2 texCoord, float mass, bool isHairRoot) :
+MassPoint::MassPoint(vec3 position, vec3 normal, vec2 texCoord, float mass, bool isHairRoot, bool foreHead) :
 	position(position),
 	normal(normal),
 	texCoord(texCoord),
@@ -37,6 +39,7 @@ MassPoint::MassPoint(vec3 position, vec3 normal, vec2 texCoord, float mass, bool
 	force(0),
 	mass(mass),
 	hairRoot(isHairRoot),
+	foreHead(foreHead),
 	primitive(0)
 {
 
@@ -96,6 +99,11 @@ vec2 MassPoint::getTexCoord() const
 bool MassPoint::isHairRoot() const
 {
 	return this->hairRoot;
+}
+
+bool MassPoint::isForeHead() const
+{
+	return this->foreHead;
 }
 
 f32 MassPoint::getMass() const

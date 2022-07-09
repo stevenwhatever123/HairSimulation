@@ -22,6 +22,7 @@ include "premake/premake_glfw.lua"
 include "premake/premake_assimp.lua"
 include "premake/premake_glm.lua"
 include "premake/premake_glad.lua"
+include "premake/premake_imgui.lua"
 
 project "HairSimulation"
 	kind "ConsoleApp"
@@ -44,7 +45,8 @@ project "HairSimulation"
 		"libraries/assimp/include",
 		"libraries/glm/",
 		"libraries/glad/include",
-		"libraries/stb/"
+		"libraries/stb/",
+		"libraries/imgui/",
 	}
 
 	dependson
@@ -53,6 +55,7 @@ project "HairSimulation"
 		"assimp",
 		"glm",
 		"glad",
+		"imgui",
 	}
 
 	links
@@ -63,6 +66,7 @@ project "HairSimulation"
 		"assimp",
 		"glm",
 		"glad",
+		"imgui",
 	}
 
 	vpaths
@@ -76,6 +80,14 @@ project "HairSimulation"
 		["Source Files"]			= {"src/*.cpp"},
 		["Source Files/Managers"]	= {"src/Managers/*.cpp"},
 		["Source Files/Utils"]		= {"src/Utils/*.cpp"},
+
+		["Source Files/imgui"] = {
+				"libraries/imgui/*.cpp",
+				"libraries/imgui/backends/imgui_impl_opengl3.cpp",
+				"libraries/imgui/backends/imgui_impl_glfw.cpp"
+
+			}
+
 	}
 
 	files
@@ -83,7 +95,10 @@ project "HairSimulation"
 		"headers/**.h",
 		"src/**.cpp",
 		"*.h",
-		"*.cpp"
+		"*.cpp",
+		"libraries/imgui/backends/imgui_impl_opengl3.cpp",
+		"libraries/imgui/backends/imgui_impl_glfw.cpp"
+
 	}
 
 	pchheader "pch.h"

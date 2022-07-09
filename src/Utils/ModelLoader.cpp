@@ -137,9 +137,14 @@ Model* SystemUtils::extractScene(const aiScene* pScene)
 		for (Mesh* mesh : meshScene->meshes)
 		{
 			if (meshScene->materials[mesh->material_index]->name.find("skull")
-				!= std::string::npos)
+				!= std::string::npos
+				&& meshScene->materials[mesh->material_index]->name.find("foreskull") == std::string::npos)
 			{
-				mesh->isSkull = true;
+				mesh->isHead = true;
+			}
+			if (meshScene->materials[mesh->material_index]->name.find("foreskull") != std::string::npos)
+			{
+				mesh->isForeHead = true;
 			}
 			mesh->isMesh = true;
 		}

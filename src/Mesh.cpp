@@ -5,7 +5,8 @@
 Mesh::Mesh() :
 	name(""),
 	isMesh(false),
-	isSkull(false),
+	isHead(false),
+	isForeHead(false),
 	isMassPoint(false),
 	positions(),
 	normals(),

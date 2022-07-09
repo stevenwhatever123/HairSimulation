@@ -39,6 +39,8 @@ public:
 	void init_shaders();
 	void init_hair_manager();
 	void init_renderer();
+	void init_imgui();
+
 
 	// Updates
 	void update();
@@ -46,6 +48,7 @@ public:
 	void update_camera();
 	void update_hair_manager();
 	void update_renderer();
+	void update_imgui();
 
 	// Utils
 	void readFile();

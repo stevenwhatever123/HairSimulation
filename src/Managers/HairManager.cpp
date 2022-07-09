@@ -61,7 +61,7 @@ void HairManager::generateHairRootMassPoints(const Mesh *mesh)
 
 		vec2 tc = (t0 + t1 + t2) / 3.0f;
 
-		MassPoint* mass_point = new MassPoint(v, n, tc, 0.1f, true);
+		MassPoint* mass_point = new MassPoint(v, n, tc, 0.1f, true, mesh->isForeHead);
 
 		mass_points.push_back(mass_point);
 	}
@@ -78,7 +78,7 @@ void HairManager::generateHairStrandMassPoints(u32 mass_point_per_strand)
 	f32 t = 0.2f;
 
 	float stiffness = 100.0f;
-	float damping = 2.0f;
+	float damping = 2.5f;
 
 	for (u32 i = 0; i < currentMassPointSize; i++)
 	{
@@ -94,26 +94,46 @@ void HairManager::generateHairStrandMassPoints(u32 mass_point_per_strand)
 
 		MassPoint* old_mass_point = mass_points[i];
 
-		MassPoint* new_mass_point = new MassPoint(new_position, direction, texCoord, old_mass, false);
+		MassPoint* new_mass_point = new MassPoint(new_position, direction, texCoord, old_mass, false, old_mass_point->isForeHead());
 
 		Spring* spring = new Spring(old_mass_point, new_mass_point, stiffness, damping);
 
 		mass_points.push_back(new_mass_point);
 		springs.push_back(spring);
 
-		for (u32 j = 1; j < mass_point_per_strand; j++)
+		if (old_mass_point->isForeHead())
 		{
-			old_position = new_position;
-			new_position = old_position + t * direction;
-			
-			old_mass_point = new_mass_point;
+			for (u32 j = 1; j < mass_point_per_strand / 3; j++)
+			{
+				old_position = new_position;
+				new_position = old_position + t * direction;
 
-			new_mass_point = new MassPoint(new_position, direction, texCoord, old_mass, false);
+				old_mass_point = new_mass_point;
 
-			Spring* spring = new Spring(old_mass_point, new_mass_point, stiffness, damping);
+				new_mass_point = new MassPoint(new_position, direction, texCoord, old_mass, false, old_mass_point->isForeHead());
 
-			mass_points.push_back(new_mass_point);
-			springs.push_back(spring);
+				Spring* spring = new Spring(old_mass_point, new_mass_point, stiffness, damping);
+
+				mass_points.push_back(new_mass_point);
+				springs.push_back(spring);
+			}
+		}
+		else
+		{
+			for (u32 j = 1; j < mass_point_per_strand; j++)
+			{
+				old_position = new_position;
+				new_position = old_position + t * direction;
+
+				old_mass_point = new_mass_point;
+
+				new_mass_point = new MassPoint(new_position, direction, texCoord, old_mass, false, old_mass_point->isForeHead());
+
+				Spring* spring = new Spring(old_mass_point, new_mass_point, stiffness, damping);
+
+				mass_points.push_back(new_mass_point);
+				springs.push_back(spring);
+			}
 		}
 	}
 

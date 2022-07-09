@@ -9,7 +9,8 @@ public:
 	std::string name;
 
 	bool isMesh;
-	bool isSkull;
+	bool isHead;
+	bool isForeHead;
 	bool isMassPoint;
 
 	// This will only use when isMassPoint is true

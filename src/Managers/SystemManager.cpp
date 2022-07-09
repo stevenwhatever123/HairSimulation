@@ -1,6 +1,7 @@
 #include <pch.h>
 
 #include <Managers/SystemManager.h>
+#include <ImGuiPanel.h>
 #include <Camera.h>
 
 SystemManager::SystemManager() : 
@@ -21,6 +22,7 @@ void SystemManager::init()
     init_shaders();
     init_hair_manager();
     init_renderer();
+    init_imgui();
 }
 
 void SystemManager::init_window()
@@ -172,6 +174,11 @@ void SystemManager::init_renderer()
     renderer->addShaderPrograms(shaderPrograms);
 }
 
+void SystemManager::init_imgui()
+{
+    SystemUI::init_imgui(window);
+}
+
 void SystemManager::update()
 {
     update_inputs();
@@ -205,6 +212,8 @@ void SystemManager::update()
     update_camera();
 
     update_renderer();
+
+    update_imgui();
 
     glfwSwapBuffers(window);
 }
@@ -246,6 +255,16 @@ void SystemManager::update_renderer()
     renderer->draw();
 }
 
+void SystemManager::update_imgui()
+{
+    glfwGetFramebufferSize(window, &width, &height);
+
+    if (width < 1 || height < 1)
+        return;
+
+    SystemUI::update_imgui(this);
+}
+
 void SystemManager::readFile()
 {
     SystemUtils::selectFile();
@@ -274,7 +293,7 @@ void SystemManager::loadModel()
 
         for (Mesh* mesh : modelScene->meshes)
         {
-            if (mesh->isSkull)
+            if (mesh->isHead || mesh->isForeHead)
             {
                 hairManager->generateHairRootMassPoints(mesh);
             }
