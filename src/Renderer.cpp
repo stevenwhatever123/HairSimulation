@@ -175,9 +175,9 @@ void Renderer::addMesh(Mesh* mesh)
 	rendObj.EBO = mesh->EBO;
 	rendObj.VAO = mesh->VAO;
 
-	u32 currentMaterialSize = materials.size();
-
-	rendObj.materialIndex = currentMaterialSize + mesh->material_index;
+	//u32 currentMaterialSize = materials.size();
+	//rendObj.materialIndex = currentMaterialSize + mesh->material_index;
+	rendObj.materialIndex = mesh->material_index;
 
 	rendObjects.push_back(rendObj);
 }

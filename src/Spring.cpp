@@ -52,22 +52,32 @@ Spring::~Spring()
 
 }
 
-void Spring::update(float dt)
+void Spring::update(f32 dt)
 {
 	// Find the difference between two mass point and the rest length
-	float differenceBetweenTwoLength = glm::distance(p1->getPosition(), p2->getPosition()) - this->restLength;
+	f32 differenceBetweenTwoLength = glm::distance(p1->getPosition(), p2->getPosition()) - this->restLength;
 
 	vec3 directionToP1 = glm::normalize(p1->getPosition() - p2->getPosition());
 	vec3 directionToP2 = glm::normalize(p2->getPosition() - p1->getPosition());
 
 	p2SpringForce = ks * (differenceBetweenTwoLength * directionToP1);
 
-	float length = glm::dot((p1->getVelocity() - p2->getVelocity()), directionToP1);
+	f32 length = glm::dot((p1->getVelocity() - p2->getVelocity()), directionToP1);
 
 	p2DampForce = kd * length * directionToP1;
 
 	p2TotalForce = p2SpringForce + p2DampForce;
 	p1TotalForce = -p2TotalForce;
+}
+
+void Spring::setStiffness(f32 stiffness)
+{
+	this->ks = stiffness;
+}
+
+void Spring::setDamping(f32 damping)
+{
+	this->kd = damping;
 }
 
 MassPoint* Spring::getMassPointOne()

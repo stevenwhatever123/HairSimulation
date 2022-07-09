@@ -4,7 +4,8 @@
 #include <ImGuiPanel.h>
 #include <Camera.h>
 
-SystemManager::SystemManager() : 
+SystemManager::SystemManager() :
+    simulate(false),
     keys(),
     left_mouse_clicked(0),
     right_mouse_clicked(0),
@@ -207,7 +208,8 @@ void SystemManager::update()
     //glEnable(GL_DEBUG_OUTPUT);
     //glDebugMessageCallback(MessageCallback, 0);
 
-    update_hair_manager();
+    if(simulate)
+        update_hair_manager();
 
     update_camera();
 

@@ -43,7 +43,10 @@ public:
 
 	~Spring();
 
-	void update(float dt);
+	void update(f32 dt);
+
+	void setStiffness(f32 stiffness);
+	void setDamping(f32 damping);
 
 	// Getters
 	MassPoint* getMassPointOne();

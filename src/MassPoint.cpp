@@ -76,6 +76,13 @@ void MassPoint::resetSpringForce()
 	this->springForce = vec3(0, 0, 0);
 }
 
+void MassPoint::resetAll()
+{
+	force = vec3(0);
+
+	velocity = vec3(0);
+}
+
 void MassPoint::addSpringForce(vec3 force)
 {
 	this->springForce += force;

@@ -40,6 +40,7 @@ public:
 
 	// Command call
 	void resetSpringForce();
+	void resetAll();
 
 	// Setters
 	void addSpringForce(vec3 force);

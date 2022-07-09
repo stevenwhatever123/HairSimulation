@@ -77,9 +77,6 @@ void HairManager::generateHairStrandMassPoints(u32 mass_point_per_strand)
 	//f32 t = 0.001f;
 	f32 t = 0.2f;
 
-	float stiffness = 100.0f;
-	float damping = 2.5f;
-
 	for (u32 i = 0; i < currentMassPointSize; i++)
 	{
 		vec3 old_position = mass_points[i]->getPosition();
@@ -193,4 +190,30 @@ void HairManager::updateHairStrandSpringMesh()
 	}
 
 	hair_springs_meshes->updateBuffers();
+}
+
+void HairManager::setStiffness(f32 stiffness)
+{
+	this->stiffness = stiffness;
+	for (Spring* spring : springs)
+	{
+		spring->setStiffness(stiffness);
+	}
+}
+
+void HairManager::setDamping(f32 damping)
+{
+	this->damping = damping;
+	for (Spring* spring : springs)
+	{
+		spring->setDamping(damping);
+	}
+}
+
+void HairManager::restart()
+{
+	for (MassPoint* mp : mass_points)
+	{
+		mp->resetAll();
+	}
 }

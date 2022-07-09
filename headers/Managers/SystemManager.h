@@ -15,6 +15,12 @@ private:
 
 	double mouseX, mouseY;			// Current mouse xy position
 
+public:
+	bool simulate;
+
+	// For the model matrix
+	vec3 modelRotation;
+
 	Renderer* renderer;
 
 	std::vector<GLShader*> shaderPrograms;
@@ -24,9 +30,7 @@ private:
 	// Hair Manager for this project
 	HairManager* hairManager;
 
-public:
-	// For the model matrix
-	vec3 modelRotation;
+	std::vector<Model*> models;
 
 public:
 
