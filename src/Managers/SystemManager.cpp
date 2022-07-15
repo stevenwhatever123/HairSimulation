@@ -122,7 +122,7 @@ void SystemManager::init_window()
 
         SystemManager* system = (SystemManager*)glfwGetWindowUserPointer(window);
 
-        if (system->left_mouse_clicked)
+        if (system->right_mouse_clicked)
         {
             double lastMouseX = system->mouseX;
             double lastMouseY = system->mouseY;
@@ -233,6 +233,8 @@ void SystemManager::update_inputs()
     if (keys['Q']) { renderer->getCamera()->moveUp(-0.01f); }
 
     if (keys['L']) { loadModel(); }
+
+    if (keys[' ']) { simulate = !simulate; }
 }
 
 void SystemManager::update_camera()
@@ -291,6 +293,8 @@ void SystemManager::loadModel()
 
         Model* modelScene = SystemUtils::readModel(modelFilename.c_str());
 
+        models.push_back(modelScene);
+
         //printModelDetails(*modelScene);
 
         for (Mesh* mesh : modelScene->meshes)
@@ -301,7 +305,14 @@ void SystemManager::loadModel()
             }
         }
 
-        hairManager->generateHairStrandMassPoints(8);
+        //hairManager->stiffness = 50.0f;
+        //hairManager->damping = 10.0f;
+
+        hairManager->stiffness = 0.3f;
+        //hairManager->damping = 0.012f;
+        hairManager->damping = 0.024f;
+
+        hairManager->generateHairStrandMassPoints(4);
 
         // Hair Strand rendering
         Mesh* hairStrandMesh = hairManager->getHairStrandSpringsAsMeshes();

@@ -61,7 +61,7 @@ void HairManager::generateHairRootMassPoints(const Mesh *mesh)
 
 		vec2 tc = (t0 + t1 + t2) / 3.0f;
 
-		MassPoint* mass_point = new MassPoint(v, n, tc, 0.1f, true, mesh->isForeHead);
+		MassPoint* mass_point = new MassPoint(v, n, tc, 0.004f, true, mesh->isForeHead);
 
 		mass_points.push_back(mass_point);
 	}
@@ -107,7 +107,7 @@ void HairManager::generateHairStrandMassPoints(u32 mass_point_per_strand)
 
 				old_mass_point = new_mass_point;
 
-				new_mass_point = new MassPoint(new_position, direction, texCoord, old_mass, false, old_mass_point->isForeHead());
+				new_mass_point = new MassPoint(new_position, direction, texCoord, old_mass / 3.0f, false, old_mass_point->isForeHead());
 
 				Spring* spring = new Spring(old_mass_point, new_mass_point, stiffness, damping);
 
