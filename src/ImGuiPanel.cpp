@@ -32,6 +32,11 @@ void SystemUI::update_imgui(SystemManager* sys)
             std::string materialFilename;
             std::tie(readSuccess, modelFilename) = SystemUtils::selectFile();
 
+            sys->hairManager->stiffness = 0.3f;
+            sys->hairManager->damping = 0.024f;
+
+            sys->hairManager->numMassPointPerStrand = 4;
+
             bool materialReadSuccess = false;
             materialFilename = modelFilename.substr(0, modelFilename.find_last_of('.')) + ".mtl";
             if (std::filesystem::exists(materialFilename)) materialReadSuccess = true;

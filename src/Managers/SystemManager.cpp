@@ -22,6 +22,7 @@ void SystemManager::init()
     init_window();
     init_shaders();
     init_hair_manager();
+    init_collision_manager();
     init_renderer();
     init_imgui();
 }
@@ -162,6 +163,11 @@ void SystemManager::init_hair_manager()
     hairManager = new HairManager();
 }
 
+void SystemManager::init_collision_manager()
+{
+    collisionManager = new CollisionManager();
+}
+
 void SystemManager::init_renderer()
 {
     Camera* camera = new Camera(vec3(0, 0, 0), vec3(0, 0, -1));
@@ -208,8 +214,13 @@ void SystemManager::update()
     //glEnable(GL_DEBUG_OUTPUT);
     //glDebugMessageCallback(MessageCallback, 0);
 
-    if(simulate)
+    if (simulate)
+    {
         update_hair_manager();
+        //update_collision_manager();
+    }
+
+    update_collision_manager();
 
     update_camera();
 
@@ -246,6 +257,11 @@ void SystemManager::update_hair_manager()
 {
     hairManager->update(0.01f);
     hairManager->updateHairStrandSpringMesh();
+}
+
+void SystemManager::update_collision_manager()
+{
+    collisionManager->update(hairManager->mass_points);
 }
 
 void SystemManager::update_renderer()
@@ -320,6 +336,11 @@ void SystemManager::loadModel()
         renderer->addMesh(hairStrandMesh);
 
         renderer->addMeshScene(modelScene);
+
+        for (Mesh* mesh : modelScene->meshes)
+        {
+            collisionManager->generateAABBTree(mesh);
+        }
 
         // Clear mesh data from cpu
         for (Mesh* mesh : modelScene->meshes)

@@ -1,6 +1,7 @@
 #pragma once
 #include <Managers/FileManager.h>
 #include <Managers/HairManager.h>
+#include <Managers/CollisionManager.h>
 #include <Utils/ModelLoader.h>
 #include <GLShader.h>
 #include <Renderer.h>
@@ -30,6 +31,9 @@ public:
 	// Hair Manager for this project
 	HairManager* hairManager;
 
+	// Manager for handling collision
+	CollisionManager* collisionManager;
+
 	std::vector<Model*> models;
 
 public:
@@ -42,6 +46,7 @@ public:
 	void init_window();
 	void init_shaders();
 	void init_hair_manager();
+	void init_collision_manager();
 	void init_renderer();
 	void init_imgui();
 
@@ -51,6 +56,7 @@ public:
 	void update_inputs();
 	void update_camera();
 	void update_hair_manager();
+	void update_collision_manager();
 	void update_renderer();
 	void update_imgui();
 
