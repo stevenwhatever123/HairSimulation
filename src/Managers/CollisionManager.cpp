@@ -123,46 +123,34 @@ void CollisionManager::recursiveAABBTreeGeneration(AABBNode* node, std::vector<v
 
 void CollisionManager::update(std::vector<MassPoint*>& mass_points)
 {
-	//for (MassPoint* mp : mass_points)
+	//bool printed = false;
+
+	//for (u32 i = 0; i < mass_points.size(); i++)
 	//{
 	//	for (AABBNode* node : aabbNodeRoots)
 	//	{
-	//		if (mp->isHairRoot())
+	//		if (mass_points[i]->isHairRoot())
 	//			continue;
 
-	//		if (node->getAABB()->checkIntersection(mp->getPosition()))
+	//		//if (node->getAABB()->checkIntersection(mass_points[i]->getPosition()))
+	//		//{
+	//		//	if (!printed)
+	//		//	{
+	//		//		printf("Collided\n");
+	//		//		printed = true;
+	//		//	}
+	//		//}
+
+	//		if (node->getAABB()->checkIntersection(mass_points[i]->getPosition()))
 	//		{
-	//			printf("Collided\n");
+	//			if (!printed)
+	//			{
+	//				printf("Collided\n");
+	//				printed = true;
+	//			}
 	//		}
 	//	}
 	//}
 
-	bool printed = false;
 
-	for (u32 i = 0; i < mass_points.size(); i++)
-	{
-		for (AABBNode* node : aabbNodeRoots)
-		{
-			if (mass_points[i]->isHairRoot())
-				continue;
-
-			//if (node->getAABB()->checkIntersection(mass_points[i]->getPosition()))
-			//{
-			//	if (!printed)
-			//	{
-			//		printf("Collided\n");
-			//		printed = true;
-			//	}
-			//}
-
-			if (node->getAABB()->checkIntersection(mass_points[i]->getPosition()))
-			{
-				if (!printed)
-				{
-					printf("Collided\n");
-					printed = true;
-				}
-			}
-		}
-	}
 }
