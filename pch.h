@@ -28,6 +28,7 @@
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/euler_angles.hpp>
+#include <glm/gtx/closest_point.hpp>
 
 // Assimp
 #include <assimp/Importer.hpp>

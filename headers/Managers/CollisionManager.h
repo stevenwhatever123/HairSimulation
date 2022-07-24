@@ -13,6 +13,8 @@ class CollisionManager
 {
 private:
 
+	bool detect;
+
 	// We don't use this atm
 	// ===================================================
 	std::vector<AABBNode*> aabbNodeRoots;
@@ -20,6 +22,8 @@ private:
 	void recursiveAABBTreeGeneration(AABBNode* node, std::vector<vec3>& positions, 
 		bool divide_in_x_axis, u32 count);
 	// ===================================================
+
+	//std::vector<CapsuleCollider*> capsuleColliders;
 
 public:
 
@@ -29,7 +33,13 @@ public:
 	void generateAABBTree(Mesh* mesh);
 	// ===================================================
 
+	std::vector<CapsuleCollider*> capsuleColliders;
 
+	void generatePresetCapsuleCollider();
+	void generateCapsuleCollider(Mesh* mesh);
+
+	void detectCollision();
+	void undetectCollision();
 
 public:
 	CollisionManager();

@@ -89,6 +89,11 @@ void MassPoint::addSpringForce(vec3 force)
 	this->springForce += force;
 }
 
+void MassPoint::stop()
+{
+	hairRoot = true;
+}
+
 vec3 MassPoint::getPosition() const
 {
 	return this->position;

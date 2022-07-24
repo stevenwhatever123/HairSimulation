@@ -1,11 +1,15 @@
 #pragma once
 #include <Types.h>
 
+#include <MassPoint.h>
+
 class CapsuleCollider
 {
 private:
 	vec3 tip;
 	vec3 base;
+
+	vec3 center;
 
 	f32 radius;
 
@@ -24,12 +28,15 @@ public:
 
 	CapsuleCollider();
 	CapsuleCollider(vec3 tip, vec3 base, f32 radius);
+	CapsuleCollider(vec3 center, f32 radius, f32 length, vec3 direction);
 
 	~CapsuleCollider();
 
 	void printInformation();
 
 	void updatePositionByTransformation();
+
+	void checkCollision(MassPoint* mass_point);
 
 	void update();
 };

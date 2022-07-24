@@ -336,10 +336,12 @@ void SystemManager::loadModel()
         renderer->addMesh(hairStrandMesh);
 
         renderer->addMeshScene(modelScene);
+        
+        collisionManager->generatePresetCapsuleCollider();
 
-        for (Mesh* mesh : modelScene->meshes)
+        for (CapsuleCollider* capsule : collisionManager->capsuleColliders)
         {
-            collisionManager->generateAABBTree(mesh);
+            capsule->printInformation();
         }
 
         // Clear mesh data from cpu

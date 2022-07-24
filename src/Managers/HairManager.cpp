@@ -74,8 +74,8 @@ void HairManager::generateHairStrandMassPoints(u32 mass_point_per_strand)
 	u32 currentMassPointSize = mass_points.size();
 
 	// distance between two mass point
-	//f32 t = 0.001f;
-	f32 t = 0.2f;
+	//f32 t = 0.2f;
+	f32 t = 0.5f;
 
 	for (u32 i = 0; i < currentMassPointSize; i++)
 	{

@@ -101,6 +101,7 @@ void SystemUI::update_imgui(SystemManager* sys)
             if (ImGui::Button("Simulate"))
             {
                 sys->simulate = !sys->simulate;
+                sys->collisionManager->detectCollision();
             }
         }
         else
@@ -108,6 +109,7 @@ void SystemUI::update_imgui(SystemManager* sys)
             if (ImGui::Button("Stop"))
             {
                 sys->simulate = !sys->simulate;
+                sys->collisionManager->undetectCollision();
             }
         }
     }

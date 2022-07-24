@@ -44,6 +44,7 @@ public:
 
 	// Setters
 	void addSpringForce(vec3 force);
+	void stop();
 
 	// Getters
 	vec3 getPosition() const;
