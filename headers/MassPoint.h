@@ -44,6 +44,8 @@ public:
 
 	// Setters
 	void addSpringForce(vec3 force);
+	void move(vec3 direction, f32 distance);
+	void collided();
 	void stop();
 
 	// Getters

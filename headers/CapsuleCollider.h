@@ -36,7 +36,8 @@ public:
 
 	void updatePositionByTransformation();
 
-	void checkCollision(MassPoint* mass_point);
+	bool checkCollision(MassPoint* mass_point);
+	void collisionResponse(MassPoint* mass_point);
 
 	void update();
 };

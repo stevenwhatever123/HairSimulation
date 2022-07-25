@@ -36,7 +36,7 @@ void SystemManager::init_window()
         closeWindow = true;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hair Simulation", NULL, NULL);
+    window = glfwCreateWindow(1600, 900, "Hair Simulation", NULL, NULL);
     if (!window)
     {
         glfwTerminate();

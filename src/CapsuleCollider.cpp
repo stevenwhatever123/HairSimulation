@@ -72,7 +72,7 @@ void CapsuleCollider::updatePositionByTransformation()
 	baseSphereCenter = base + lineEndOffset;
 }
 
-void CapsuleCollider::checkCollision(MassPoint* mass_point)
+bool CapsuleCollider::checkCollision(MassPoint* mass_point)
 {
 	vec3 closestPointOnLine = glm::closestPointOnLine(mass_point->getPosition(),
 		baseSphereCenter, tipSphereCenter);
@@ -81,11 +81,17 @@ void CapsuleCollider::checkCollision(MassPoint* mass_point)
 
 	if (distance_between_two_point <= radius)
 	{
-		if (!mass_point->isHairRoot())
-		{
-			mass_point->stop();
-		}
+		// Push the mass point away
+		vec3 direction = glm::normalize(mass_point->getPosition() - closestPointOnLine);
+
+		mass_point->move(direction, radius - distance_between_two_point);
+
+		mass_point->collided();
+
+		return true;
 	}
+
+	return false;
 }
 
 void CapsuleCollider::update()

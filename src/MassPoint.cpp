@@ -89,6 +89,16 @@ void MassPoint::addSpringForce(vec3 force)
 	this->springForce += force;
 }
 
+void MassPoint::move(vec3 direction, f32 distance)
+{
+	this->position = this->position + (direction * distance);
+}
+
+void MassPoint::collided()
+{
+	this->velocity = this->velocity / -2.0f;
+}
+
 void MassPoint::stop()
 {
 	hairRoot = true;

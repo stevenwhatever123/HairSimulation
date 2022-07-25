@@ -183,6 +183,11 @@ void CollisionManager::update(std::vector<MassPoint*>& mass_points)
 	{
 		//collider->printInformation();
 		for (MassPoint* mp : mass_points)
-			collider->checkCollision(mp);
+		{
+			if (collider->checkCollision(mp))
+			{
+
+			}
+		}
 	}
 }

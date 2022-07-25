@@ -23,6 +23,8 @@ void SystemUI::update_imgui(SystemManager* sys)
 
     ImGui::Begin("Hello World");
 
+    ImGui::SetWindowSize(ImVec2(200, 300));
+
     if (sys->models.size() < 1)
     {
         if (ImGui::Button("Load Model"))
