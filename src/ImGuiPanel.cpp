@@ -86,8 +86,8 @@ void SystemUI::update_imgui(SystemManager* sys)
         f32 stiffness = sys->hairManager->stiffness;
         f32 damping = sys->hairManager->damping;
 
-        ImGui::SliderFloat("Stiffness", &stiffness, 0.0f, 200.0f);
-        ImGui::SliderFloat("Damping", &damping, 0.0f, 5.0f);
+        ImGui::SliderFloat("Stiffness", &stiffness, 0.0f, 1.0f);
+        ImGui::SliderFloat("Damping", &damping, 0.0f, 1.0f);
 
         if (stiffness != sys->hairManager->stiffness)
         {
