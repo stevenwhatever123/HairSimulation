@@ -321,13 +321,6 @@ void SystemManager::loadModel()
             }
         }
 
-        //hairManager->stiffness = 50.0f;
-        //hairManager->damping = 10.0f;
-
-        hairManager->stiffness = 0.3f;
-        //hairManager->damping = 0.012f;
-        hairManager->damping = 0.024f;
-
         hairManager->generateHairStrandMassPoints(4);
 
         // Hair Strand rendering

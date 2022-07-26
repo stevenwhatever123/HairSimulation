@@ -15,8 +15,11 @@ public:
 
 	i32 numMassPointPerStrand = 8;
 
-	f32 stiffness = 100.0f;
-	f32 damping = 2.5f;
+	//f32 stiffness = 0.3f;
+	//f32 damping = 0.024f;
+
+	f32 stiffness = 5.0f;
+	f32 damping = 0.2f;
 
 	std::vector<MassPoint*> mass_points;
 	std::vector<Spring*> springs;

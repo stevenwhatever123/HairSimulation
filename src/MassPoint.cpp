@@ -96,7 +96,7 @@ void MassPoint::move(vec3 direction, f32 distance)
 
 void MassPoint::collided()
 {
-	this->velocity = this->velocity / -2.0f;
+	this->velocity = this->velocity / -5.0f;
 }
 
 void MassPoint::stop()
