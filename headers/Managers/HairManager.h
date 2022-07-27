@@ -4,6 +4,7 @@
 #include "MassPoint.h"
 #include "Mesh.h"
 #include "Spring.h"
+#include "Strand.h"
 
 class HairManager
 {
@@ -23,6 +24,8 @@ public:
 
 	std::vector<MassPoint*> mass_points;
 	std::vector<Spring*> springs;
+	std::vector<Strand*> strands;
+	
 
 public:
 	HairManager();
@@ -35,7 +38,9 @@ public:
 	void generateHairStrandMassPoints(u32 mass_point_per_strand);
 
 	Mesh* getHairStrandSpringsAsMeshes();
+	Mesh* getHairStrangSpringsAsTriangleMeshes();
 	void updateHairStrandSpringMesh();
+	void updateHairStrangSpringTriangleMesh();
 
 	void setStiffness(f32 stiffness);
 	void setDamping(f32 damping);

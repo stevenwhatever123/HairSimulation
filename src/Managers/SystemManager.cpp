@@ -257,6 +257,7 @@ void SystemManager::update_hair_manager()
 {
     hairManager->update(0.01f);
     hairManager->updateHairStrandSpringMesh();
+    //hairManager->updateHairStrangSpringTriangleMesh();
 }
 
 void SystemManager::update_collision_manager()
@@ -325,6 +326,7 @@ void SystemManager::loadModel()
 
         // Hair Strand rendering
         Mesh* hairStrandMesh = hairManager->getHairStrandSpringsAsMeshes();
+        //Mesh* hairStrandMesh = hairManager->getHairStrangSpringsAsTriangleMeshes();
         hairStrandMesh->generateBuffers(currentProgram, 1);
         renderer->addMesh(hairStrandMesh);
 

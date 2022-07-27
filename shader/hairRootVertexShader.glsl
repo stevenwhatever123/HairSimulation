@@ -10,8 +10,9 @@ uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 
-layout(location = 0) out vec3 oNormal;
-layout(location = 1) out vec2 oTexCoord;
+layout(location = 0) out vec4 oPosition;
+layout(location = 1) out vec3 oNormal;
+layout(location = 2) out vec2 oTexCoord;
 
 void main()
 {
@@ -20,6 +21,7 @@ void main()
 
 	gl_PointSize = 5.0f;
 
-	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1);
+	oPosition = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1);
+	gl_Position = oPosition;
 	//gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(u_position, 1);
 }
