@@ -61,7 +61,7 @@ void HairManager::generateHairRootMassPoints(const Mesh *mesh)
 
 		vec2 tc = (t0 + t1 + t2) / 3.0f;
 
-		MassPoint* mass_point = new MassPoint(v, n, tc, 0.004f, true, mesh->isForeHead);
+		MassPoint* mass_point = new MassPoint(v, n, tc, 0.002f, true, mesh->isForeHead);
 
 		mass_points.push_back(mass_point);
 	}
@@ -225,6 +225,98 @@ Mesh* HairManager::getHairStrangSpringsAsTriangleMeshes()
 	hair_springs_meshes->isMesh = false;
 	hair_springs_meshes->isMassPoint = true;
 	hair_springs_meshes->primitive_type = GL_TRIANGLES;
+	//hair_springs_meshes->primitive_type = GL_LINES;
+
+	return hair_springs_meshes;
+}
+
+Mesh* HairManager::getHairStrandSpringsAsCurveMeshes()
+{
+	u32 steps = 6;
+
+	hair_springs_meshes = new Mesh();
+	hair_springs_meshes->name = "MassPointSpring";
+	// 10 t point in each spring
+	hair_springs_meshes->positions.resize(springs.size() * 2 * steps);
+	hair_springs_meshes->normals.resize(springs.size() * 2 * steps);
+	hair_springs_meshes->texCoords.resize(springs.size() * 2 * steps);
+	hair_springs_meshes->indicies.resize(springs.size() * 2 * steps);
+
+	u32 counter = 0;
+
+	for (u32 i = 0; i < strands.size(); i++)
+	{
+		for (u32 j = 0; j < strands[i]->springs.size(); j++)
+		{
+			if (j == strands[i]->springs.size() - 1)
+			{
+				continue;
+			}
+
+			f32 distance = glm::distance(strands[i]->springs[j]->getMassPointOne()->getPosition(),
+				strands[i]->springs[j]->getMassPointTwo()->getPosition());
+
+			vec3 p1_control_point_direction = glm::normalize(strands[i]->springs[j]->getMassPointTwo()->getPosition()
+				- strands[i]->springs[j]->getMassPointOne()->getPosition());
+
+			vec3 p1_control_point = strands[i]->springs[j]->getMassPointOne()->getPosition()
+				+ (p1_control_point_direction * (distance / 4));
+
+			// Because it is pointing from p1 to p3, we flip the direction
+			vec3 p2_control_point_direction = -glm::normalize(strands[i]->springs[j + 1]->getMassPointTwo()->getPosition()
+				- strands[i]->springs[j]->getMassPointOne()->getPosition());
+
+			vec3 p2_control_point = strands[i]->springs[j]->getMassPointTwo()->getPosition()
+				+ (p2_control_point_direction * (distance / 4));
+
+		
+
+			vec3 old_point = strands[i]->springs[j]->getMassPointOne()->getPosition();
+
+			for (u32 k = 0; k <= steps; k++)
+			{
+				f32 t = glm::clamp((f32)k / steps, 0.0f, 1.0f);
+
+				// This formula references to "The Beauty of Bézier Curves"
+				// The De Casteljau's Algorithm
+				vec3 A = glm::mix(strands[i]->springs[j]->getMassPointOne()->getPosition(),
+					p1_control_point, t);
+				vec3 B = glm::mix(p1_control_point, p2_control_point, t);
+				vec3 C = glm::mix(p2_control_point,
+					strands[i]->springs[j]->getMassPointTwo()->getPosition(), t);
+
+				vec3 D = glm::mix(A, B, t);
+				vec3 E = glm::mix(B, C, t);
+
+				vec3 P = glm::mix(D, E, t);
+
+				hair_springs_meshes->positions[counter * 2] = old_point;
+				hair_springs_meshes->positions[counter * 2 + 1] = P;
+
+				// ===========================================================
+				// Not important ATM
+
+				hair_springs_meshes->normals[counter * 2] = strands[i]->springs[j]->getMassPointOne()
+					->getNormal();
+				hair_springs_meshes->normals[counter * 2 + 1] = strands[i]->springs[j]->getMassPointTwo()
+					->getNormal();
+
+				hair_springs_meshes->texCoords[counter * 2] = vec2(0, 0);
+				hair_springs_meshes->texCoords[counter * 2 + 1] = vec2(0.5f, 0);
+
+				hair_springs_meshes->indicies[counter * 2] = counter * 2;
+				hair_springs_meshes->indicies[counter * 2 + 1] = counter * 2 + 1;
+				// ===========================================================
+				old_point = P;
+
+				counter++;
+			}
+		}
+	}
+
+	hair_springs_meshes->isMesh = false;
+	hair_springs_meshes->isMassPoint = true;
+	hair_springs_meshes->primitive_type = GL_LINES;
 
 	return hair_springs_meshes;
 }
@@ -241,12 +333,6 @@ void HairManager::updateHairStrandSpringMesh()
 
 		hair_springs_meshes->normals[i * 2] = springs[i]->getMassPointOne()->getNormal();
 		hair_springs_meshes->normals[i * 2 + 1] = springs[i]->getMassPointTwo()->getNormal();
-
-		hair_springs_meshes->texCoords[i * 2] = springs[i]->getMassPointOne()->getTexCoord();
-		hair_springs_meshes->texCoords[i * 2 + 1] = springs[i]->getMassPointTwo()->getTexCoord();
-
-		hair_springs_meshes->indicies[i * 2] = i * 2;
-		hair_springs_meshes->indicies[i * 2 + 1] = i * 2 + 1;
 	}
 
 	hair_springs_meshes->updateBuffers();
@@ -265,32 +351,101 @@ void HairManager::updateHairStrangSpringTriangleMesh()
 		{
 			if (j == strands[i]->springs.size() - 1)
 			{
-				break;
+				continue;
 			}
 
-			hair_springs_meshes->positions[j * 3] = strands[i]->springs[j]->getMassPointOne()
+			hair_springs_meshes->positions[counter * 3] = strands[i]->springs[j]->getMassPointOne()
 				->getPosition();
-			hair_springs_meshes->positions[j * 3 + 1] = strands[i]->springs[j]->getMassPointTwo()
+			hair_springs_meshes->positions[counter * 3 + 1] = strands[i]->springs[j]->getMassPointTwo()
 				->getPosition();
-			hair_springs_meshes->positions[j * 3 + 2] = strands[i]->springs[j + 1]->getMassPointTwo()
+			hair_springs_meshes->positions[counter * 3 + 2] = strands[i]->springs[j + 1]->getMassPointTwo()
 				->getPosition();
 
-			hair_springs_meshes->normals[j * 3] = strands[i]->springs[j]->getMassPointOne()
+			hair_springs_meshes->normals[counter * 3] = strands[i]->springs[j]->getMassPointOne()
 				->getNormal();
-			hair_springs_meshes->normals[j * 3 + 1] = strands[i]->springs[j]->getMassPointTwo()
+			hair_springs_meshes->normals[counter * 3 + 1] = strands[i]->springs[j]->getMassPointTwo()
 				->getNormal();
-			hair_springs_meshes->normals[j * 3 + 2] = strands[i]->springs[j + 1]->getMassPointTwo()
+			hair_springs_meshes->normals[counter * 3 + 2] = strands[i]->springs[j + 1]->getMassPointTwo()
 				->getNormal();
-
-			hair_springs_meshes->texCoords[counter * 3] = vec2(0, 0);
-			hair_springs_meshes->texCoords[counter * 3 + 1] = vec2(0.5f, 0);
-			hair_springs_meshes->texCoords[counter * 3 + 2] = vec2(1.0f, 1.0f);
-
-			hair_springs_meshes->indicies[counter * 3] = counter * 3;
-			hair_springs_meshes->indicies[counter * 3 + 1] = counter * 3 + 1;
-			hair_springs_meshes->indicies[counter * 3 + 2] = counter * 3 + 2;
 
 			counter++;
+		}
+	}
+
+	hair_springs_meshes->updateBuffers();
+}
+
+void HairManager::updateHairStrandSpringCurveMesh()
+{
+	if (hair_springs_meshes == nullptr)
+		return;
+
+	u32 steps = 6;
+
+	u32 counter = 0;
+
+	for (u32 i = 0; i < strands.size(); i++)
+	{
+		for (u32 j = 0; j < strands[i]->springs.size(); j++)
+		{
+			if (j == strands[i]->springs.size() - 1)
+			{
+				continue;
+			}
+
+			f32 distance = glm::distance(strands[i]->springs[j]->getMassPointOne()->getPosition(),
+				strands[i]->springs[j]->getMassPointTwo()->getPosition());
+
+			vec3 p1_control_point_direction = glm::normalize(strands[i]->springs[j]->getMassPointTwo()->getPosition()
+				- strands[i]->springs[j]->getMassPointOne()->getPosition());
+
+			vec3 p1_control_point = strands[i]->springs[j]->getMassPointOne()->getPosition()
+				+ (p1_control_point_direction * (distance / 4));
+
+			// Because it is pointing from p1 to p3, we flip the direction
+			vec3 p2_control_point_direction = -glm::normalize(strands[i]->springs[j + 1]->getMassPointTwo()->getPosition()
+				- strands[i]->springs[j]->getMassPointOne()->getPosition());
+
+			vec3 p2_control_point = strands[i]->springs[j]->getMassPointTwo()->getPosition()
+				+ (p2_control_point_direction * (distance / 4));
+
+
+
+			vec3 old_point = strands[i]->springs[j]->getMassPointOne()->getPosition();
+
+			for (u32 k = 0; k <= steps; k++)
+			{
+				f32 t = glm::clamp((f32)k / steps, 0.0f, 1.0f);
+
+				// This formula references to "The Beauty of Bézier Curves"
+				// The De Casteljau's Algorithm
+				vec3 A = glm::mix(strands[i]->springs[j]->getMassPointOne()->getPosition(),
+					p1_control_point, t);
+				vec3 B = glm::mix(p1_control_point, p2_control_point, t);
+				vec3 C = glm::mix(p2_control_point,
+					strands[i]->springs[j]->getMassPointTwo()->getPosition(), t);
+
+				vec3 D = glm::mix(A, B, t);
+				vec3 E = glm::mix(B, C, t);
+
+				vec3 P = glm::mix(D, E, t);
+
+				hair_springs_meshes->positions[counter * 2] = old_point;
+				hair_springs_meshes->positions[counter * 2 + 1] = P;
+
+				// ===========================================================
+				// Not important ATM
+
+				hair_springs_meshes->normals[counter * 2] = strands[i]->springs[j]->getMassPointOne()
+					->getNormal();
+				hair_springs_meshes->normals[counter * 2 + 1] = strands[i]->springs[j]->getMassPointTwo()
+					->getNormal();
+
+				// ===========================================================
+				old_point = P;
+
+				counter++;
+			}
 		}
 	}
 

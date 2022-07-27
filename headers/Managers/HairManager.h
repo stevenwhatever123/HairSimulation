@@ -16,11 +16,11 @@ public:
 
 	i32 numMassPointPerStrand = 8;
 
-	//f32 stiffness = 0.3f;
-	//f32 damping = 0.024f;
+	f32 stiffness = 1.0f;
+	f32 damping = 0.024f;
 
-	f32 stiffness = 5.0f;
-	f32 damping = 0.2f;
+	//f32 stiffness = 5.0f;
+	//f32 damping = 0.2f;
 
 	std::vector<MassPoint*> mass_points;
 	std::vector<Spring*> springs;
@@ -39,8 +39,10 @@ public:
 
 	Mesh* getHairStrandSpringsAsMeshes();
 	Mesh* getHairStrangSpringsAsTriangleMeshes();
+	Mesh* getHairStrandSpringsAsCurveMeshes();
 	void updateHairStrandSpringMesh();
 	void updateHairStrangSpringTriangleMesh();
+	void updateHairStrandSpringCurveMesh();
 
 	void setStiffness(f32 stiffness);
 	void setDamping(f32 damping);

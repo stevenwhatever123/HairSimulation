@@ -256,8 +256,9 @@ void SystemManager::update_camera()
 void SystemManager::update_hair_manager()
 {
     hairManager->update(0.01f);
-    hairManager->updateHairStrandSpringMesh();
+    //hairManager->updateHairStrandSpringMesh();
     //hairManager->updateHairStrangSpringTriangleMesh();
+    hairManager->updateHairStrandSpringCurveMesh();
 }
 
 void SystemManager::update_collision_manager()
@@ -322,11 +323,11 @@ void SystemManager::loadModel()
             }
         }
 
-        hairManager->generateHairStrandMassPoints(4);
+        hairManager->generateHairStrandMassPoints(8);
 
         // Hair Strand rendering
-        Mesh* hairStrandMesh = hairManager->getHairStrandSpringsAsMeshes();
-        //Mesh* hairStrandMesh = hairManager->getHairStrangSpringsAsTriangleMeshes();
+        //Mesh* hairStrandMesh = hairManager->getHairStrandSpringsAsMeshes();
+        Mesh* hairStrandMesh = hairManager->getHairStrandSpringsAsCurveMeshes();
         hairStrandMesh->generateBuffers(currentProgram, 1);
         renderer->addMesh(hairStrandMesh);
 
