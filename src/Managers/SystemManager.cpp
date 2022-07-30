@@ -123,7 +123,7 @@ void SystemManager::init_window()
 
         SystemManager* system = (SystemManager*)glfwGetWindowUserPointer(window);
 
-        if (system->right_mouse_clicked)
+        if (system->left_mouse_clicked)
         {
             double lastMouseX = system->mouseX;
             double lastMouseY = system->mouseY;

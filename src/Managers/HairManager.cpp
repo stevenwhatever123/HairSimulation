@@ -61,7 +61,12 @@ void HairManager::generateHairRootMassPoints(const Mesh *mesh)
 
 		vec2 tc = (t0 + t1 + t2) / 3.0f;
 
-		MassPoint* mass_point = new MassPoint(v, n, tc, 0.002f, true, mesh->isForeHead);
+		f32 temp_mass = mass / numMassPointPerStrand;
+
+		if (mesh->isForeHead)
+			temp_mass = mass / glm::ceil((f32) numMassPointPerStrand / 3);
+
+		MassPoint* mass_point = new MassPoint(v, n, tc, temp_mass, true, mesh->isForeHead);
 
 		mass_points.push_back(mass_point);
 	}
@@ -77,66 +82,44 @@ void HairManager::generateHairStrandMassPoints(u32 mass_point_per_strand)
 
 	// distance between two mass point
 	//f32 t = 0.2f;
+
+	// This looks fine with fore head
 	f32 t = 0.5f;
 
 	for (u32 i = 0; i < currentMassPointSize; i++)
 	{
-		vec3 old_position = mass_points[i]->getPosition();
-
-		vec3 direction = mass_points[i]->getNormal();
-
-		vec3 new_position = old_position + t * direction;
-
-		vec2 texCoord = mass_points[i]->getTexCoord();
-
+		MassPoint* old_mass_point = mass_points[i];
+		vec3 old_position = old_mass_point->getPosition();
+		vec3 direction = old_mass_point->getNormal();
+		vec2 texCoord = old_mass_point->getTexCoord();
 		f32 old_mass = mass_points[i]->getMass();
 
-		MassPoint* old_mass_point = mass_points[i];
+		u32 numPoint = mass_point_per_strand;
 
-		MassPoint* new_mass_point = new MassPoint(new_position, direction, texCoord, old_mass, false, old_mass_point->isForeHead());
-
-		Spring* spring = new Spring(old_mass_point, new_mass_point, stiffness, damping);
-
-		mass_points.push_back(new_mass_point);
-		springs.push_back(spring);
 		strands[i] = new Strand();
-		strands[i]->springs.push_back(spring);
+
+		t = longStrandLength / numPoint;
 
 		if (old_mass_point->isForeHead())
 		{
-			for (u32 j = 1; j < mass_point_per_strand / 3; j++)
-			{
-				old_position = new_position;
-				new_position = old_position + t * direction;
-
-				old_mass_point = new_mass_point;
-
-				new_mass_point = new MassPoint(new_position, direction, texCoord, old_mass / 3.0f, false, old_mass_point->isForeHead());
-
-				Spring* spring = new Spring(old_mass_point, new_mass_point, stiffness, damping);
-
-				mass_points.push_back(new_mass_point);
-				springs.push_back(spring);
-				strands[i]->springs.push_back(spring);
-			}
+			numPoint = glm::ceil((f32) mass_point_per_strand / 3);
+			t = shortStrandLength / numPoint;
 		}
-		else
+
+		for (u32 j = 0; j < numPoint; j++)
 		{
-			for (u32 j = 1; j < mass_point_per_strand; j++)
-			{
-				old_position = new_position;
-				new_position = old_position + t * direction;
+			vec3 new_position = old_position + t * direction;
 
-				old_mass_point = new_mass_point;
+			MassPoint* new_mass_point = new MassPoint(new_position, direction, texCoord, old_mass, false, old_mass_point->isForeHead());
 
-				new_mass_point = new MassPoint(new_position, direction, texCoord, old_mass, false, old_mass_point->isForeHead());
+			Spring* spring = new Spring(old_mass_point, new_mass_point, stiffness, damping);
 
-				Spring* spring = new Spring(old_mass_point, new_mass_point, stiffness, damping);
+			mass_points.push_back(new_mass_point);
+			springs.push_back(spring);
+			strands[i]->springs.push_back(spring);
 
-				mass_points.push_back(new_mass_point);
-				springs.push_back(spring);
-				strands[i]->springs.push_back(spring);
-			}
+			old_position = new_position;
+			old_mass_point = new_mass_point;
 		}
 	}
 
