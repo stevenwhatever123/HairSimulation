@@ -17,7 +17,8 @@ void HairManager::update(float dt)
 {
 	for (Strand* strand : strands)
 	{
-		strand->update(dt);
+		//strand->update(dt);
+		strand->updateImproved(dt);
 	}
 
 	for (MassPoint* mp : mass_points)
@@ -113,9 +114,50 @@ void HairManager::generateHairStrandMassPoints(u32 mass_point_per_strand)
 			old_position = new_position;
 			old_mass_point = new_mass_point;
 		}
+
+		strands[i]->create_bending_springs(stiffness, damping);
+		strands[i]->create_torsion_springs(stiffness, damping);
 	}
 
 	printf("Generated %i hair root mass points\n", mass_points.size());
+}
+
+void HairManager::generateSingleHairStrand()
+{
+	strands.resize(1);
+
+	vec3 v(0);
+	vec3 n(1, 0, 0);
+	vec2 tc(0);
+
+	u32 pointNum = 50;
+
+	f32 temp_mass = mass / pointNum;
+
+	MassPoint* old_mass_point = new MassPoint(v, n, tc, temp_mass, true, false);
+
+	mass_points.push_back(old_mass_point);
+
+	f32 t = 0.1f;
+
+	strands[0] = new Strand();
+
+	for (u32 i = 1; i < pointNum; i++)
+	{
+		vec3 new_position = v + t * n;
+		MassPoint* new_mass_point = new MassPoint(new_position, n, tc, temp_mass, false, false);
+		Spring* spring = new Spring(old_mass_point, new_mass_point, stiffness, damping);
+
+		mass_points.push_back(new_mass_point);
+		springs.push_back(spring);
+		strands[0]->springs.push_back(spring);
+
+		old_mass_point = new_mass_point;
+		v = new_position;
+	}
+
+	strands[0]->create_bending_springs(stiffness, damping);
+	strands[0]->create_torsion_springs(stiffness, damping);
 }
 
 Mesh* HairManager::getHairStrandSpringsAsMeshes()
@@ -146,61 +188,6 @@ Mesh* HairManager::getHairStrandSpringsAsMeshes()
 	hair_springs_meshes->isMesh = false;
 	hair_springs_meshes->isMassPoint = true;
 	hair_springs_meshes->primitive_type = GL_LINES;
-
-	return hair_springs_meshes;
-}
-
-Mesh* HairManager::getHairStrangSpringsAsTriangleMeshes()
-{
-	hair_springs_meshes = new Mesh();
-
-	hair_springs_meshes->name = "MassPointSpring";
-	hair_springs_meshes->positions.resize(springs.size() * 3);
-	hair_springs_meshes->normals.resize(springs.size() * 3);
-	hair_springs_meshes->texCoords.resize(springs.size() * 3);
-	hair_springs_meshes->indicies.resize(springs.size() * 3);
-
-	u32 counter = 0;
-
-	for (u32 i = 0; i < strands.size(); i++)
-	{
-		for (u32 j = 0; j < strands[i]->springs.size(); j++)
-		{
-			if (j == strands[i]->springs.size() - 1)
-			{
-				continue;
-			}
-
-			hair_springs_meshes->positions[counter * 3] = strands[i]->springs[j]->getMassPointOne()
-				->getPosition();
-			hair_springs_meshes->positions[counter * 3 + 1] = strands[i]->springs[j]->getMassPointTwo()
-				->getPosition();
-			hair_springs_meshes->positions[counter * 3 + 2] = strands[i]->springs[j + 1]->getMassPointTwo()
-				->getPosition();
-
-			hair_springs_meshes->normals[counter * 3] = strands[i]->springs[j]->getMassPointOne()
-				->getNormal();
-			hair_springs_meshes->normals[counter * 3 + 1] = strands[i]->springs[j]->getMassPointTwo()
-				->getNormal();
-			hair_springs_meshes->normals[counter * 3 + 2] = strands[i]->springs[j + 1]->getMassPointTwo()
-				->getNormal();
-
-			hair_springs_meshes->texCoords[counter * 3] = vec2(0, 0);
-			hair_springs_meshes->texCoords[counter * 3 + 1] = vec2(0.5f, 0);
-			hair_springs_meshes->texCoords[counter * 3 + 2] = vec2(1.0f, 1.0f);
-
-			hair_springs_meshes->indicies[counter * 3] = counter * 3;
-			hair_springs_meshes->indicies[counter * 3 + 1] = counter * 3 + 1;
-			hair_springs_meshes->indicies[counter * 3 + 2] = counter * 3 + 2;
-
-			counter++;
-		}
-	}
-
-	hair_springs_meshes->isMesh = false;
-	hair_springs_meshes->isMassPoint = true;
-	hair_springs_meshes->primitive_type = GL_TRIANGLES;
-	//hair_springs_meshes->primitive_type = GL_LINES;
 
 	return hair_springs_meshes;
 }
@@ -308,43 +295,6 @@ void HairManager::updateHairStrandSpringMesh()
 
 		hair_springs_meshes->normals[i * 2] = springs[i]->getMassPointOne()->getNormal();
 		hair_springs_meshes->normals[i * 2 + 1] = springs[i]->getMassPointTwo()->getNormal();
-	}
-
-	hair_springs_meshes->updateBuffers();
-}
-
-void HairManager::updateHairStrangSpringTriangleMesh()
-{
-	if (hair_springs_meshes == nullptr)
-		return;
-
-	u32 counter = 0;
-
-	for (u32 i = 0; i < strands.size(); i++)
-	{
-		for (u32 j = 0; j < strands[i]->springs.size(); j++)
-		{
-			if (j == strands[i]->springs.size() - 1)
-			{
-				continue;
-			}
-
-			hair_springs_meshes->positions[counter * 3] = strands[i]->springs[j]->getMassPointOne()
-				->getPosition();
-			hair_springs_meshes->positions[counter * 3 + 1] = strands[i]->springs[j]->getMassPointTwo()
-				->getPosition();
-			hair_springs_meshes->positions[counter * 3 + 2] = strands[i]->springs[j + 1]->getMassPointTwo()
-				->getPosition();
-
-			hair_springs_meshes->normals[counter * 3] = strands[i]->springs[j]->getMassPointOne()
-				->getNormal();
-			hair_springs_meshes->normals[counter * 3 + 1] = strands[i]->springs[j]->getMassPointTwo()
-				->getNormal();
-			hair_springs_meshes->normals[counter * 3 + 2] = strands[i]->springs[j + 1]->getMassPointTwo()
-				->getNormal();
-
-			counter++;
-		}
 	}
 
 	hair_springs_meshes->updateBuffers();

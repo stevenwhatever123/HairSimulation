@@ -25,6 +25,19 @@ void SystemUI::update_imgui(SystemManager* sys)
 
     ImGui::SetWindowSize(ImVec2(200, 300));
 
+    SystemUI::import_head_handle(sys);
+
+    SystemUI::single_strand(sys);
+
+    ImGui::End();
+
+    ImGui::Render();
+
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void SystemUI::import_head_handle(SystemManager* sys)
+{
     if (sys->models.size() < 1)
     {
         if (ImGui::Button("Load Model"))
@@ -33,9 +46,6 @@ void SystemUI::update_imgui(SystemManager* sys)
             std::string modelFilename;
             std::string materialFilename;
             std::tie(readSuccess, modelFilename) = SystemUtils::selectFile();
-
-            sys->hairManager->stiffness = 0.3f;
-            sys->hairManager->damping = 0.024f;
 
             sys->hairManager->numMassPointPerStrand = 4;
 
@@ -115,11 +125,36 @@ void SystemUI::update_imgui(SystemManager* sys)
             }
         }
     }
+}
 
+void SystemUI::single_strand(SystemManager* sys)
+{
+    if (sys->hairManager->mass_points.size() < 1)
+    {
+        if (ImGui::Button("Single Strand"))
+        {
+            sys->hairManager->generateSingleHairStrand();
+            Mesh* hairStrandMesh = sys->hairManager->getHairStrandSpringsAsCurveMeshes();
+            hairStrandMesh->generateBuffers(sys->currentProgram, 1);
+            sys->renderer->addMesh(hairStrandMesh);
+        }
+        return;
+    }
 
-    ImGui::End();
-
-    ImGui::Render();
-
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    if (!sys->simulate)
+    {
+        if (ImGui::Button("Simulate"))
+        {
+            sys->simulate = !sys->simulate;
+            sys->collisionManager->detectCollision();
+        }
+    }
+    else
+    {
+        if (ImGui::Button("Stop"))
+        {
+            sys->simulate = !sys->simulate;
+            sys->collisionManager->undetectCollision();
+        }
+    }
 }

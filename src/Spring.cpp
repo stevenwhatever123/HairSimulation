@@ -60,14 +60,20 @@ void Spring::update(f32 dt)
 	vec3 directionToP1 = glm::normalize(p1->getPosition() - p2->getPosition());
 	vec3 directionToP2 = glm::normalize(p2->getPosition() - p1->getPosition());
 
-	p2SpringForce = ks * (differenceBetweenTwoLength * directionToP1);
+	p2SpringForce = ks * differenceBetweenTwoLength * directionToP1;
 
 	f32 length = glm::dot((p1->getVelocity() - p2->getVelocity()), directionToP1);
 
 	p2DampForce = kd * length * directionToP1;
 
+
+
 	p2TotalForce = p2SpringForce + p2DampForce;
+
 	p1TotalForce = -p2TotalForce;
+
+	//p2TotalForce = p2SpringForce + p2DampForce;
+	//p1TotalForce = -p2TotalForce;
 }
 
 void Spring::setStiffness(f32 stiffness)

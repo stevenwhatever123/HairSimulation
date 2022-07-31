@@ -82,6 +82,12 @@ void CollisionManager::generatePresetCapsuleCollider()
 		vec3(0.0007734895f, 2.26f, 0.24f), 0.8f, 1.0f, vec3(0, 1, 0));
 
 	capsuleColliders.push_back(capsuleFace);
+
+	// Head Skull
+	CapsuleCollider* capsuleHead = new CapsuleCollider(
+		vec3(0.0007734895f, 1.86f, -0.17f), 1.0f, 1.0f, vec3(0, 1, 0));
+
+	capsuleColliders.push_back(capsuleHead);
 }
 
 void CollisionManager::generateCapsuleCollider(Mesh* mesh)
