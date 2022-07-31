@@ -15,5 +15,7 @@ public:
 
 	Strand();
 	~Strand();
+
+	void update(f32 dt);
 };
 

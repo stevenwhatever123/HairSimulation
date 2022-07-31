@@ -15,18 +15,9 @@ HairManager::~HairManager()
 
 void HairManager::update(float dt)
 {
-	for (Spring* spring : springs)
+	for (Strand* strand : strands)
 	{
-		spring->getMassPointOne()->resetSpringForce();
-		spring->getMassPointTwo()->resetSpringForce();
-	}
-
-	for (Spring* spring : springs)
-	{
-		spring->update(dt);
-
-		spring->getMassPointOne()->addSpringForce(spring->getP1TotalForce());
-		spring->getMassPointTwo()->addSpringForce(spring->getP2TotalForce());
+		strand->update(dt);
 	}
 
 	for (MassPoint* mp : mass_points)
@@ -102,7 +93,8 @@ void HairManager::generateHairStrandMassPoints(u32 mass_point_per_strand)
 
 		if (old_mass_point->isForeHead())
 		{
-			numPoint = glm::ceil((f32) mass_point_per_strand / 3);
+			//numPoint = glm::ceil((f32) mass_point_per_strand / 3);
+			numPoint = 5;
 			t = shortStrandLength / numPoint;
 		}
 
@@ -220,10 +212,10 @@ Mesh* HairManager::getHairStrandSpringsAsCurveMeshes()
 	hair_springs_meshes = new Mesh();
 	hair_springs_meshes->name = "MassPointSpring";
 	// 10 t point in each spring
-	hair_springs_meshes->positions.resize(springs.size() * 2 * steps);
-	hair_springs_meshes->normals.resize(springs.size() * 2 * steps);
-	hair_springs_meshes->texCoords.resize(springs.size() * 2 * steps);
-	hair_springs_meshes->indicies.resize(springs.size() * 2 * steps);
+	hair_springs_meshes->positions.resize(springs.size() * 2 * (steps + 2));
+	hair_springs_meshes->normals.resize(springs.size() * 2 * (steps + 2));
+	hair_springs_meshes->texCoords.resize(springs.size() * 2 * (steps + 2));
+	hair_springs_meshes->indicies.resize(springs.size() * 2 * (steps + 2));
 
 	u32 counter = 0;
 

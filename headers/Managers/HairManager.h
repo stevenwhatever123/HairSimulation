@@ -16,7 +16,8 @@ public:
 
 	i32 numMassPointPerStrand = 8;
 
-	f32 stiffness = 1.0f;
+	//f32 stiffness = 1.0f;
+	f32 stiffness = 1.5f;
 	f32 damping = 0.015f;
 	//f32 damping = 0.024f;
 
