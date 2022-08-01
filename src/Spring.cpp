@@ -70,6 +70,8 @@ void Spring::update(f32 dt)
 
 	p2TotalForce = p2SpringForce + p2DampForce;
 
+
+
 	p1TotalForce = -p2TotalForce;
 
 	//p2TotalForce = p2SpringForce + p2DampForce;

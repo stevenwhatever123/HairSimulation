@@ -16,9 +16,11 @@ public:
 
 	i32 numMassPointPerStrand = 8;
 
-	f32 stiffness = 0.25f;
-	f32 damping = 0.00075f;
-	//f32 damping = 0.0f;
+	//f32 stiffness = 0.4f;
+	//f32 damping = 0.001f;
+
+	f32 stiffness = 0.1f;
+	f32 damping = 0.06f;
 
 	// Works great with normal mp
 	//f32 stiffness = 2.0f;

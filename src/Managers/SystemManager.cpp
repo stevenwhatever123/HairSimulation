@@ -255,7 +255,7 @@ void SystemManager::update_camera()
 
 void SystemManager::update_hair_manager()
 {
-    hairManager->update(0.01f);
+    hairManager->update(0.0005f);
     //hairManager->updateHairStrandSpringMesh();
     hairManager->updateHairStrandSpringCurveMesh();
 }
