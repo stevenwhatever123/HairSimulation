@@ -132,7 +132,8 @@ void HairManager::generateSingleHairStrand()
 
 	u32 pointNum = 50;
 
-	f32 temp_mass = mass / pointNum;
+	//f32 temp_mass = mass / pointNum;
+	f32 temp_mass = mass;
 
 	MassPoint* old_mass_point = new MassPoint(v, n, tc, temp_mass, true, false);
 
