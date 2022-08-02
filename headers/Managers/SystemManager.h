@@ -16,6 +16,10 @@ private:
 
 	double mouseX, mouseY;			// Current mouse xy position
 
+	f64 currentTime;
+	f64 deltaTime;
+	f64 lastTime;
+
 public:
 	bool simulate;
 
@@ -55,7 +59,7 @@ public:
 	void update();
 	void update_inputs();
 	void update_camera();
-	void update_hair_manager();
+	void update_hair_manager(f64 deltaTime);
 	void update_collision_manager();
 	void update_renderer();
 	void update_imgui();

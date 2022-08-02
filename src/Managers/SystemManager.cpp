@@ -25,6 +25,11 @@ void SystemManager::init()
     init_collision_manager();
     init_renderer();
     init_imgui();
+
+    // Init time
+    currentTime = glfwGetTime();
+    deltaTime = 0;
+    lastTime = currentTime;
 }
 
 void SystemManager::init_window()
@@ -196,6 +201,11 @@ void SystemManager::update()
 
         glfwTerminate();
     }
+
+    // Update time
+    currentTime = glfwGetTime();
+    deltaTime = currentTime - lastTime;
+    lastTime = currentTime;
     
     // Debug Log
     //auto MessageCallback = [](GLenum source,
@@ -216,7 +226,7 @@ void SystemManager::update()
 
     if (simulate)
     {
-        update_hair_manager();
+        update_hair_manager(deltaTime);
         //update_collision_manager();
     }
 
@@ -253,9 +263,9 @@ void SystemManager::update_camera()
     renderer->getCamera()->updateTransformation();
 }
 
-void SystemManager::update_hair_manager()
+void SystemManager::update_hair_manager(f64 deltaTime)
 {
-    hairManager->update(0.0005f);
+    hairManager->update(deltaTime);
     //hairManager->updateHairStrandSpringMesh();
     hairManager->updateHairStrandSpringCurveMesh();
 }

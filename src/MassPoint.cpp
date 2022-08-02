@@ -64,7 +64,7 @@ void MassPoint::update(float dt)
 
 	vec3 gravity(0, -9.8f, 0);
 
-	force += gravity * mass + springForce;
+	force += (gravity * mass) + springForce;
 
 	velocity += (force * dt) / mass;
 

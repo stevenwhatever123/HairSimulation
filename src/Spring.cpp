@@ -20,7 +20,26 @@ Spring::Spring():
 
 }
 
-Spring::Spring(MassPoint* p1, MassPoint* p2, float ks, float kd):
+Spring::Spring(MassPoint* p1, MassPoint* p2, f32 ks, f32 kd):
+	p1(p1),
+	p2(p2),
+	ks(ks),
+	restLength(0),
+	kd(kd),
+	springForce(0),
+	dampForce(0),
+	totalForce(0),
+	p1SpringForce(0),
+	p2SpringForce(0),
+	p1DampForce(0),
+	p2DampForce(0),
+	p1TotalForce(0),
+	p2TotalForce(0)
+{
+	this->restLength = glm::distance(p2->getPosition(), p1->getPosition());
+}
+
+Spring::Spring(MassPoint* p1, MassPoint* p2, bool half, f32 ks, f32 kd) :
 	p1(p1),
 	p2(p2),
 	ks(ks),
@@ -38,13 +57,8 @@ Spring::Spring(MassPoint* p1, MassPoint* p2, float ks, float kd):
 {
 	this->restLength = glm::distance(p2->getPosition(), p1->getPosition());
 
-	//float differenceBetweenTwoLength = glm::distance(p2->getPosition(), p1->getPosition());
-	//this->springForce = ks * differenceBetweenTwoLength;
-
-	//this->dampForce = glm::dot(glm::normalize(p2->getPosition() - p1->getPosition()), (p2->getVelocity() - p1->getVelocity())) * kd;
-
-	//this->totalForce = this->springForce = this->dampForce;
-
+	if (half)
+		this->restLength = this->restLength / 2;
 }
 
 Spring::~Spring()

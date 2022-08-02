@@ -13,20 +13,48 @@ HairManager::~HairManager()
 
 }
 
-void HairManager::update(float dt)
+void HairManager::update(f64 dt)
 {
-	for (Strand* strand : strands)
-	{
-		//strand->update(dt);
-		strand->updateImproved(dt);
-	}
+	accumulator += dt;
 
-	for (MassPoint* mp : mass_points)
-	{
-		if (mp->isHairRoot())
-			continue;
+	//while (accumulator >= time_step)
+	//{
+	//	for (Strand* strand : strands)
+	//	{
+	//		//strand->update(dt);
+	//		strand->updateImproved(time_step);
+	//	}
 
-		mp->update(dt);
+	//	for (MassPoint* mp : mass_points)
+	//	{
+	//		if (mp->isHairRoot())
+	//			continue;
+
+	//		mp->update(time_step);
+	//	}
+
+	//	accumulator -= time_step;
+	//}
+
+	f32 time = 0.01f;
+
+	while (time >= time_step)
+	{
+		for (Strand* strand : strands)
+		{
+			//strand->update(dt);
+			strand->updateImproved(time_step);
+		}
+
+		for (MassPoint* mp : mass_points)
+		{
+			if (mp->isHairRoot())
+				continue;
+
+			mp->update(time_step);
+		}
+
+		time -= time_step;
 	}
 }
 
@@ -157,8 +185,8 @@ void HairManager::generateSingleHairStrand()
 		v = new_position;
 	}
 
-	strands[0]->create_bending_springs(stiffness, damping);
-	strands[0]->create_torsion_springs(stiffness, damping);
+	strands[0]->create_bending_springs(bending_stiffness, bending_damping);
+	strands[0]->create_torsion_springs(torsion_stiffness, torsion_damping);
 }
 
 Mesh* HairManager::getHairStrandSpringsAsMeshes()

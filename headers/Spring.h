@@ -39,7 +39,8 @@ public:
 
 public:
 	Spring();
-	Spring(MassPoint* p1, MassPoint* p2, float ks, float kd);
+	Spring(MassPoint* p1, MassPoint* p2, f32 ks, f32 kd);
+	Spring(MassPoint* p1, MassPoint* p2, bool half, f32 ks, f32 kd);
 
 	~Spring();
 

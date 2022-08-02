@@ -23,7 +23,7 @@ void Strand::create_bending_springs(f32 stiffness, f32 damping)
 		MassPoint* p1 = springs[i]->getMassPointOne();
 		MassPoint* p2 = springs[i + 1]->getMassPointTwo();
 
-		Spring* bending_spring = new Spring(p1, p2, stiffness, damping);
+		Spring* bending_spring = new Spring(p1, p2, true, stiffness, damping);
 
 		bending_springs.push_back(bending_spring);
 	}
@@ -40,7 +40,7 @@ void Strand::create_torsion_springs(f32 stiffness, f32 damping)
 		MassPoint* p1 = springs[i]->getMassPointOne();
 		MassPoint* p2 = springs[i + 2]->getMassPointTwo();
 
-		Spring* torsion_spring = new Spring(p1, p2, stiffness, damping);
+		Spring* torsion_spring = new Spring(p1, p2, true, stiffness, damping);
 
 		torsion_springs.push_back(torsion_spring);
 	}
@@ -90,6 +90,6 @@ void Strand::updateImproved(f32 dt)
 	// Normal springs update
 	update(dt);
 
-	//update_bending(dt);
-	//update_torsion(dt);
+	update_bending(dt);
+	update_torsion(dt);
 }
