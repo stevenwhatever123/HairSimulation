@@ -228,10 +228,10 @@ Mesh* HairManager::getHairStrandSpringsAsCurveMeshes()
 	hair_springs_meshes = new Mesh();
 	hair_springs_meshes->name = "MassPointSpring";
 	// 10 t point in each spring
-	hair_springs_meshes->positions.resize(springs.size() * 2 * (steps + 2));
-	hair_springs_meshes->normals.resize(springs.size() * 2 * (steps + 2));
-	hair_springs_meshes->texCoords.resize(springs.size() * 2 * (steps + 2));
-	hair_springs_meshes->indicies.resize(springs.size() * 2 * (steps + 2));
+	hair_springs_meshes->positions.resize(springs.size() * 2 * (steps + 1));
+	hair_springs_meshes->normals.resize(springs.size() * 2 * (steps + 1));
+	hair_springs_meshes->texCoords.resize(springs.size() * 2 * (steps + 1));
+	hair_springs_meshes->indicies.resize(springs.size() * 2 * (steps + 1));
 
 	u32 counter = 0;
 

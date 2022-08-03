@@ -58,7 +58,7 @@ Spring::Spring(MassPoint* p1, MassPoint* p2, bool half, f32 ks, f32 kd) :
 	this->restLength = glm::distance(p2->getPosition(), p1->getPosition());
 
 	if (half)
-		this->restLength = this->restLength / 2;
+		this->restLength = this->restLength / 3;
 }
 
 Spring::~Spring()

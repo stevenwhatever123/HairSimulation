@@ -23,7 +23,7 @@ void Strand::create_bending_springs(f32 stiffness, f32 damping)
 		MassPoint* p1 = springs[i]->getMassPointOne();
 		MassPoint* p2 = springs[i + 1]->getMassPointTwo();
 
-		Spring* bending_spring = new Spring(p1, p2, true, stiffness, damping);
+		Spring* bending_spring = new Spring(p1, p2, false, stiffness, damping);
 
 		bending_springs.push_back(bending_spring);
 	}
