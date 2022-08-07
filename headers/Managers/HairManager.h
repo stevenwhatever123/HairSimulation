@@ -77,8 +77,10 @@ public:
 	void generateSingleHairStrand();
 
 	Mesh* getHairStrandSpringsAsMeshes();
+	Mesh* getHairStrandMassPointsAsMeshes();
 	Mesh* getHairStrandSpringsAsCurveMeshes();
 	void updateHairStrandSpringMesh();
+	void updateHairStrandMassPointMesh();
 	void updateHairStrandSpringCurveMesh();
 
 	void setStiffness(f32 stiffness);

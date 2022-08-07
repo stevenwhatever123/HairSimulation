@@ -268,6 +268,7 @@ void SystemManager::update_hair_manager(f64 deltaTime)
     hairManager->update(deltaTime);
     //hairManager->updateHairStrandSpringMesh();
     hairManager->updateHairStrandSpringCurveMesh();
+    hairManager->updateHairStrandMassPointMesh();
 }
 
 void SystemManager::update_collision_manager()
@@ -335,10 +336,12 @@ void SystemManager::loadModel()
         hairManager->generateHairStrandMassPoints(10);
 
         // Hair Strand rendering
-        //Mesh* hairStrandMesh = hairManager->getHairStrandSpringsAsMeshes();
-        Mesh* hairStrandMesh = hairManager->getHairStrandSpringsAsCurveMeshes();
+        Mesh* hairStrandMesh = hairManager->getHairStrandSpringsAsMeshes();
+        Mesh* hairMassPoint = hairManager->getHairStrandMassPointsAsMeshes();
+        //Mesh* hairStrandMesh = hairManager->getHairStrandSpringsAsCurveMeshes();
         hairStrandMesh->generateBuffers(currentProgram, 1);
         renderer->addMesh(hairStrandMesh);
+        renderer->addMesh(hairMassPoint);
 
         renderer->addMeshScene(modelScene);
         

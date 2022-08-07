@@ -221,6 +221,30 @@ Mesh* HairManager::getHairStrandSpringsAsMeshes()
 	return hair_springs_meshes;
 }
 
+Mesh* HairManager::getHairStrandMassPointsAsMeshes()
+{
+	hair_springs_meshes = new Mesh();
+	hair_springs_meshes->name = "MassPoints";
+	hair_springs_meshes->positions.resize(mass_points.size());
+	hair_springs_meshes->normals.resize(mass_points.size());
+	hair_springs_meshes->texCoords.resize(mass_points.size());
+	hair_springs_meshes->indicies.resize(mass_points.size());
+
+	for (u32 i = 0; i < mass_points.size(); i++)
+	{
+		hair_springs_meshes->positions[i] = mass_points[i]->getPosition();
+		hair_springs_meshes->normals[i] = mass_points[i]->getNormal();
+		hair_springs_meshes->texCoords[i] = mass_points[i]->getTexCoord();
+		hair_springs_meshes->indicies[i] = i;
+	}
+
+	hair_springs_meshes->isMesh = false;
+	hair_springs_meshes->isMassPoint = true;
+	hair_springs_meshes->primitive_type = GL_POINTS;
+
+	return hair_springs_meshes;
+}
+
 Mesh* HairManager::getHairStrandSpringsAsCurveMeshes()
 {
 	u32 steps = 6;
@@ -324,6 +348,21 @@ void HairManager::updateHairStrandSpringMesh()
 
 		hair_springs_meshes->normals[i * 2] = springs[i]->getMassPointOne()->getNormal();
 		hair_springs_meshes->normals[i * 2 + 1] = springs[i]->getMassPointTwo()->getNormal();
+	}
+
+	hair_springs_meshes->updateBuffers();
+}
+
+void HairManager::updateHairStrandMassPointMesh()
+{
+	if (hair_springs_meshes == nullptr)
+		return;
+
+	for (u32 i = 0; i < mass_points.size(); i++)
+	{
+		hair_springs_meshes->positions[i] = mass_points[i]->getPosition();
+		hair_springs_meshes->normals[i] = mass_points[i]->getNormal();
+		hair_springs_meshes->texCoords[i] = mass_points[i]->getTexCoord();
 	}
 
 	hair_springs_meshes->updateBuffers();
