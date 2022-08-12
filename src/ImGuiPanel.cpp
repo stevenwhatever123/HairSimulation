@@ -134,6 +134,7 @@ void SystemUI::single_strand(SystemManager* sys)
         if (ImGui::Button("Single Strand"))
         {
             sys->hairManager->generateSingleHairStrand();
+            //Mesh* hairStrandMesh = sys->hairManager->getHairStrandSpringsAsMeshes();
             Mesh* hairStrandMesh = sys->hairManager->getHairStrandSpringsAsCurveMeshes();
             hairStrandMesh->generateBuffers(sys->currentProgram, 1);
             sys->renderer->addMesh(hairStrandMesh);

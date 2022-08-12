@@ -21,8 +21,8 @@ public:
 	i32 numMassPointPerStrand = 8;
 
 	// This works great with normal string
-	//f32 stiffness = 4.0f;
-	//f32 damping = 0.07f;
+	f32 stiffness = 4.0f;
+	f32 damping = 0.07f;
 
 	//================================
 	// This works great with curly hair
@@ -38,14 +38,16 @@ public:
 
 	//================================
 
-	f32 stiffness = 4.0f;
-	f32 damping = 0.3f;
+	//f32 stiffness = 4.0f;
+	//f32 damping = 0.3f;
 
 	f32 bending_stiffness = 0.5f;
 	f32 bending_damping = 0.1f;
 
 	f32 torsion_stiffness = 0.5f;
 	f32 torsion_damping = 0.1f;
+
+	//===============================
 
 	// Works great with normal mp
 	//f32 stiffness = 2.0f;

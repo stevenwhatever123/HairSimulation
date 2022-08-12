@@ -48,11 +48,11 @@ void Strand::create_torsion_springs(f32 stiffness, f32 damping)
 
 void Strand::update(f32 dt)
 {
-	for (Spring* spring : springs)
-	{
-		spring->getMassPointOne()->resetSpringForce();
-		spring->getMassPointTwo()->resetSpringForce();
-	}
+	//for (Spring* spring : springs)
+	//{
+	//	spring->getMassPointOne()->resetSpringForce();
+	//	spring->getMassPointTwo()->resetSpringForce();
+	//}
 
 	for (Spring* spring : springs)
 	{

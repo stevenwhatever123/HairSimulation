@@ -227,10 +227,17 @@ void SystemManager::update()
     if (simulate)
     {
         update_hair_manager(deltaTime);
-        //update_collision_manager();
+        update_collision_manager();
+
+        frameCount++;
+        timePasses += deltaTime;
+        
+        printf("Frame count: %d\n", frameCount);
+        printf("Delta time average: %lf\n", timePasses / frameCount);
+        printf("Fps average: %lf\n", (f64) frameCount / timePasses);
     }
 
-    update_collision_manager();
+    //update_collision_manager();
 
     update_camera();
 
@@ -268,7 +275,6 @@ void SystemManager::update_hair_manager(f64 deltaTime)
     hairManager->update(deltaTime);
     //hairManager->updateHairStrandSpringMesh();
     hairManager->updateHairStrandSpringCurveMesh();
-    hairManager->updateHairStrandMassPointMesh();
 }
 
 void SystemManager::update_collision_manager()
@@ -336,21 +342,16 @@ void SystemManager::loadModel()
         hairManager->generateHairStrandMassPoints(10);
 
         // Hair Strand rendering
-        Mesh* hairStrandMesh = hairManager->getHairStrandSpringsAsMeshes();
-        Mesh* hairMassPoint = hairManager->getHairStrandMassPointsAsMeshes();
-        //Mesh* hairStrandMesh = hairManager->getHairStrandSpringsAsCurveMeshes();
+        //Mesh* hairStrandMesh = hairManager->getHairStrandSpringsAsMeshes();
+        Mesh* hairStrandMesh = hairManager->getHairStrandSpringsAsCurveMeshes();
         hairStrandMesh->generateBuffers(currentProgram, 1);
         renderer->addMesh(hairStrandMesh);
-        renderer->addMesh(hairMassPoint);
 
         renderer->addMeshScene(modelScene);
         
         collisionManager->generatePresetCapsuleCollider();
 
-        for (CapsuleCollider* capsule : collisionManager->capsuleColliders)
-        {
-            capsule->printInformation();
-        }
+        printf("There are %d strands\n", hairManager->strands.size());
 
         // Clear mesh data from cpu
         for (Mesh* mesh : modelScene->meshes)

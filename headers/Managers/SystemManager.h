@@ -20,6 +20,10 @@ private:
 	f64 deltaTime;
 	f64 lastTime;
 
+	u64 frameCount = 0;
+	f64 timePasses = 0;
+	f64 fpsAverage = 0;
+
 public:
 	bool simulate;
 

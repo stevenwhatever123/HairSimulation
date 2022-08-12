@@ -15,7 +15,7 @@ HairManager::~HairManager()
 
 void HairManager::update(f64 dt)
 {
-	accumulator += dt;
+	//accumulator += dt;
 
 	//while (accumulator >= time_step)
 	//{
@@ -36,25 +36,49 @@ void HairManager::update(f64 dt)
 	//	accumulator -= time_step;
 	//}
 
-	f32 time = 0.01f;
+	// ========================================
 
-	while (time >= time_step)
+	//f32 time = 0.01f;
+
+	//while (time >= time_step)
+	//{
+	//	for (Strand* strand : strands)
+	//	{
+	//		//strand->update(time_step);
+	//		strand->updateImproved(time_step);
+	//	}
+
+	//	for (MassPoint* mp : mass_points)
+	//	{
+	//		if (mp->isHairRoot())
+	//			continue;
+
+	//		mp->update(time_step);
+	//	}
+
+	//	time -= time_step;
+	//}
+
+	// ======================================
+
+	for (Spring* spring : springs)
 	{
-		for (Strand* strand : strands)
-		{
-			//strand->update(dt);
-			strand->updateImproved(time_step);
-		}
+		spring->getMassPointOne()->resetSpringForce();
+		spring->getMassPointTwo()->resetSpringForce();
+	}
 
-		for (MassPoint* mp : mass_points)
-		{
-			if (mp->isHairRoot())
-				continue;
+	for (Strand* strand : strands)
+	{
+		strand->update(0.001f);
+		//strand->updateImproved(0.001f);
+	}
 
-			mp->update(time_step);
-		}
+	for (MassPoint* mp : mass_points)
+	{
+		if (mp->isHairRoot())
+			continue;
 
-		time -= time_step;
+		mp->update(0.001f);
 	}
 }
 
@@ -62,33 +86,36 @@ void HairManager::generateHairRootMassPoints(const Mesh *mesh)
 {
 	for (u32 i = 0; i < mesh->indicies.size() - 3; i += 3)
 	{
-		// Get the middle point of the face
-		vec3 v0 = mesh->positions[mesh->indicies[i + 0]];
-		vec3 v1 = mesh->positions[mesh->indicies[i + 1]];
-		vec3 v2 = mesh->positions[mesh->indicies[i + 2]];
+		for (u32 j = 0; j < 1; j++)
+		{
+			// Get the middle point of the face
+			vec3 v0 = mesh->positions[mesh->indicies[i + 0]];
+			vec3 v1 = mesh->positions[mesh->indicies[i + 1]];
+			vec3 v2 = mesh->positions[mesh->indicies[i + 2]];
 
-		vec3 n0 = mesh->normals[mesh->indicies[i + 0]];
-		vec3 n1 = mesh->normals[mesh->indicies[i + 1]];
-		vec3 n2 = mesh->normals[mesh->indicies[i + 2]];
+			vec3 n0 = mesh->normals[mesh->indicies[i + 0]];
+			vec3 n1 = mesh->normals[mesh->indicies[i + 1]];
+			vec3 n2 = mesh->normals[mesh->indicies[i + 2]];
 
-		vec2 t0 = mesh->texCoords[mesh->indicies[i + 0]];
-		vec2 t1 = mesh->texCoords[mesh->indicies[i + 1]];
-		vec2 t2 = mesh->texCoords[mesh->indicies[i + 2]];
+			vec2 t0 = mesh->texCoords[mesh->indicies[i + 0]];
+			vec2 t1 = mesh->texCoords[mesh->indicies[i + 1]];
+			vec2 t2 = mesh->texCoords[mesh->indicies[i + 2]];
 
-		vec3 v = (v0 + v1 + v2) / 3.0f;
+			vec3 v = (v0 + v1 + v2) / 3.0f;
 
-		vec3 n = (n0 + n1 + n2) / 3.0f;
+			vec3 n = (n0 + n1 + n2) / 3.0f;
 
-		vec2 tc = (t0 + t1 + t2) / 3.0f;
+			vec2 tc = (t0 + t1 + t2) / 3.0f;
 
-		f32 temp_mass = mass / numMassPointPerStrand;
+			f32 temp_mass = mass / numMassPointPerStrand;
 
-		if (mesh->isForeHead)
-			temp_mass = mass / glm::ceil((f32) numMassPointPerStrand / 3);
+			if (mesh->isForeHead)
+				temp_mass = mass / glm::ceil((f32)numMassPointPerStrand / 3);
 
-		MassPoint* mass_point = new MassPoint(v, n, tc, temp_mass, true, mesh->isForeHead);
+			MassPoint* mass_point = new MassPoint(v, n, tc, temp_mass, true, mesh->isForeHead);
 
-		mass_points.push_back(mass_point);
+			mass_points.push_back(mass_point);
+		}
 	}
 
 	printf("Generated %i hair root mass points\n", mass_points.size());
@@ -123,7 +150,7 @@ void HairManager::generateHairStrandMassPoints(u32 mass_point_per_strand)
 		if (old_mass_point->isForeHead())
 		{
 			//numPoint = glm::ceil((f32) mass_point_per_strand / 3);
-			numPoint = 5;
+			//numPoint = 5;
 			t = shortStrandLength / numPoint;
 		}
 
@@ -384,7 +411,7 @@ void HairManager::updateHairStrandSpringCurveMesh()
 			if (j == strands[i]->springs.size() - 1)
 			{
 				continue;
-			}
+			}	
 
 			f32 distance = glm::distance(strands[i]->springs[j]->getMassPointOne()->getPosition(),
 				strands[i]->springs[j]->getMassPointTwo()->getPosition());
